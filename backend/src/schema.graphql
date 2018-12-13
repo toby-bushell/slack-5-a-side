@@ -1,0 +1,63 @@
+# import * from './generated/prisma.graphql'
+
+type Mutation {
+  createPlayer(
+    name: String!
+    email: String!
+    username: String!
+    image: String
+  ): Player
+  createRinger(name: String!, email: String!): Player
+  deletePlayer(id: ID!): Player
+  createMatch(time: DateTime): Match
+  deleteMatch(id: ID!): Match
+  addToMatch(id: ID!, playerId: ID!): Match
+  removeFromMatch(id: ID!, playerId: ID!): Match
+  saveSlackChannelMembers: [Player]!
+  setAdminOptions(
+    koTime: DateTime!
+    maxPlayers: Int!
+    reminderTime: DateTime!
+  ): AdminOption!
+  signup(email: String!, password: String!, name: String!): User!
+  signin(email: String!, password: String!): User!
+  sendReminder(playerId: ID!, matchId: ID!): String!
+}
+type Channel {
+  name: String!
+  id: ID!
+}
+
+type Query {
+  players(
+    where: PlayerWhereInput
+    orderBy: PlayerOrderByInput
+    skip: Int
+    after: String
+    before: String
+    first: Int
+    last: Int
+  ): [Player]!
+  me: User
+  matches(
+    where: MatchWhereInput
+    orderBy: MatchOrderByInput
+    skip: Int
+    after: String
+    before: String
+    first: Int
+    last: Int
+  ): [Match]!
+  match(where: MatchWhereUniqueInput!): Match
+  adminOptions(
+    where: AdminOptionWhereInput
+    orderBy: AdminOptionOrderByInput
+    skip: Int
+    after: String
+    before: String
+    first: Int
+    last: Int
+  ): [AdminOption]!
+  nextMatch: [Match]!
+  channels: [Channel]!
+}

@@ -1,0 +1,47 @@
+enum UserType {
+  MANIFESTO
+  RINGER
+}
+
+enum Permission {
+  ADMIN
+  USER
+}
+
+type User {
+  id: ID! @unique
+  player: Player
+  name: String!
+  email: String! @unique
+  password: String!
+  resetToken: String
+  resetTokenExpiry: Float
+  permissions: [Permission]
+}
+
+type Player {
+  id: ID! @unique
+  name: String!
+  email: String!
+  username: String!
+  image: String
+  userType: UserType!
+  reminders: Boolean!
+  matchesPlayed: [Match!]!
+  slackId: ID
+}
+
+type Match {
+  id: ID! @unique
+  time: DateTime
+  reminderTime: DateTime
+  remindersSent: [ID!]!
+  players: [Player!]!
+}
+
+type AdminOption {
+  id: ID! @unique
+  koTime: String!
+  maxPlayers: Int!
+  reminderTime: String
+}
