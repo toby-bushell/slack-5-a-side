@@ -9,7 +9,6 @@ const db = require('../db');
 module.exports = class Reminders {
   async setup(match) {
     if (!match) throw 'no match set';
-    console.log('\x1b[32m', 'match', match, '\x1b[0m');
 
     const { reminderTime, id } = match;
     // 1) work out timeout in seconds
@@ -116,8 +115,6 @@ module.exports = class Reminders {
     // 2) Store all reminder promises in an array
     const reminderArray = allPossible.map(async match => {
       const reminder = await this.setup(match);
-      console.log('\x1b[32m', 'reminder', reminder, '\x1b[0m');
-
       return reminder;
     });
 

@@ -143,5 +143,4 @@ server.listen(3001, async () => {
   console.log(`Find the server at: http://localhost:3001/`); // eslint-disable-line no-console
   const Reminders = new reminders(db);
   Reminders.setAllReminders();
-  console.log('\x1b[31m', 'firing', '\x1b[0m');
 });

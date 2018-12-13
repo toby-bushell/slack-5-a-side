@@ -25,8 +25,6 @@ const Query = {
     );
   },
   async nextMatch(parent, args, ctx, info) {
-    console.log('\x1b[32m', 'firing?', info, args, '\x1b[0m');
-
     const currentDate = new Date();
     const nextMatch = await ctx.db.query.matches(
       {

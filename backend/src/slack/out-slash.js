@@ -5,8 +5,6 @@ module.exports = class OutSlash {
   }
 
   async response(nextMatch, player) {
-    console.log('\x1b[32m', 'response firing', '\x1b[0m');
-
     try {
       // If they were not playing then don't update
       const playerIsIn = nextMatch.players.some(
