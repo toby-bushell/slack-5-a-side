@@ -1,5 +1,5 @@
 {
-  "name": "fiveaside-backed",
+  "name": "fiveaside-backend",
   "description": "Manifesto five a side",
   "scripts": {
     "start": "node src/index.js",
