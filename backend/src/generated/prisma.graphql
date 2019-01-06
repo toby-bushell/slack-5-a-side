@@ -1,11 +1,12 @@
 # source: https://eu1.prisma.sh/tobybushell-3ac7e4/fiveaside/dev
-# timestamp: Wed Dec 05 2018 22:04:42 GMT+0000 (Greenwich Mean Time)
+# timestamp: Fri Jan 04 2019 22:28:46 GMT+0000 (Greenwich Mean Time)
 
 type AdminOption implements Node {
   id: ID!
   koTime: String!
   maxPlayers: Int!
   reminderTime: String
+  reminderDay: Int
 }
 
 """A connection to a list of items."""
@@ -22,6 +23,7 @@ input AdminOptionCreateInput {
   koTime: String!
   maxPlayers: Int!
   reminderTime: String
+  reminderDay: Int
 }
 
 """An edge in a connection."""
@@ -42,6 +44,8 @@ enum AdminOptionOrderByInput {
   maxPlayers_DESC
   reminderTime_ASC
   reminderTime_DESC
+  reminderDay_ASC
+  reminderDay_DESC
   updatedAt_ASC
   updatedAt_DESC
   createdAt_ASC
@@ -53,6 +57,7 @@ type AdminOptionPreviousValues {
   koTime: String!
   maxPlayers: Int!
   reminderTime: String
+  reminderDay: Int
 }
 
 type AdminOptionSubscriptionPayload {
@@ -98,12 +103,14 @@ input AdminOptionUpdateInput {
   koTime: String
   maxPlayers: Int
   reminderTime: String
+  reminderDay: Int
 }
 
 input AdminOptionUpdateManyMutationInput {
   koTime: String
   maxPlayers: Int
   reminderTime: String
+  reminderDay: Int
 }
 
 input AdminOptionWhereInput {
@@ -257,6 +264,28 @@ input AdminOptionWhereInput {
 
   """All values not ending with the given string."""
   reminderTime_not_ends_with: String
+  reminderDay: Int
+
+  """All values that are not equal to given value."""
+  reminderDay_not: Int
+
+  """All values that are contained in given list."""
+  reminderDay_in: [Int!]
+
+  """All values that are not contained in given list."""
+  reminderDay_not_in: [Int!]
+
+  """All values less than the given value."""
+  reminderDay_lt: Int
+
+  """All values less than or equal the given value."""
+  reminderDay_lte: Int
+
+  """All values greater than the given value."""
+  reminderDay_gt: Int
+
+  """All values greater than or equal the given value."""
+  reminderDay_gte: Int
 }
 
 input AdminOptionWhereUniqueInput {
@@ -298,6 +327,7 @@ type Match implements Node {
   reminderTime: DateTime
   remindersSent: [ID!]!
   players(where: PlayerWhereInput, orderBy: PlayerOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Player!]
+  playersOut(where: PlayerWhereInput, orderBy: PlayerOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Player!]
 }
 
 """A connection to a list of items."""
@@ -315,10 +345,16 @@ input MatchCreateInput {
   reminderTime: DateTime
   remindersSent: MatchCreateremindersSentInput
   players: PlayerCreateManyWithoutMatchesPlayedInput
+  playersOut: PlayerCreateManyWithoutMatchesOptedOutInput
 }
 
 input MatchCreateManyWithoutPlayersInput {
   create: [MatchCreateWithoutPlayersInput!]
+  connect: [MatchWhereUniqueInput!]
+}
+
+input MatchCreateManyWithoutPlayersOutInput {
+  create: [MatchCreateWithoutPlayersOutInput!]
   connect: [MatchWhereUniqueInput!]
 }
 
@@ -330,6 +366,14 @@ input MatchCreateWithoutPlayersInput {
   time: DateTime
   reminderTime: DateTime
   remindersSent: MatchCreateremindersSentInput
+  playersOut: PlayerCreateManyWithoutMatchesOptedOutInput
+}
+
+input MatchCreateWithoutPlayersOutInput {
+  time: DateTime
+  reminderTime: DateTime
+  remindersSent: MatchCreateremindersSentInput
+  players: PlayerCreateManyWithoutMatchesPlayedInput
 }
 
 """An edge in a connection."""
@@ -500,6 +544,7 @@ input MatchUpdateInput {
   reminderTime: DateTime
   remindersSent: MatchUpdateremindersSentInput
   players: PlayerUpdateManyWithoutMatchesPlayedInput
+  playersOut: PlayerUpdateManyWithoutMatchesOptedOutInput
 }
 
 input MatchUpdateManyDataInput {
@@ -525,6 +570,17 @@ input MatchUpdateManyWithoutPlayersInput {
   upsert: [MatchUpsertWithWhereUniqueWithoutPlayersInput!]
 }
 
+input MatchUpdateManyWithoutPlayersOutInput {
+  create: [MatchCreateWithoutPlayersOutInput!]
+  connect: [MatchWhereUniqueInput!]
+  disconnect: [MatchWhereUniqueInput!]
+  delete: [MatchWhereUniqueInput!]
+  update: [MatchUpdateWithWhereUniqueWithoutPlayersOutInput!]
+  updateMany: [MatchUpdateManyWithWhereNestedInput!]
+  deleteMany: [MatchScalarWhereInput!]
+  upsert: [MatchUpsertWithWhereUniqueWithoutPlayersOutInput!]
+}
+
 input MatchUpdateManyWithWhereNestedInput {
   where: MatchScalarWhereInput!
   data: MatchUpdateManyDataInput!
@@ -538,6 +594,14 @@ input MatchUpdateWithoutPlayersDataInput {
   time: DateTime
   reminderTime: DateTime
   remindersSent: MatchUpdateremindersSentInput
+  playersOut: PlayerUpdateManyWithoutMatchesOptedOutInput
+}
+
+input MatchUpdateWithoutPlayersOutDataInput {
+  time: DateTime
+  reminderTime: DateTime
+  remindersSent: MatchUpdateremindersSentInput
+  players: PlayerUpdateManyWithoutMatchesPlayedInput
 }
 
 input MatchUpdateWithWhereUniqueWithoutPlayersInput {
@@ -545,10 +609,21 @@ input MatchUpdateWithWhereUniqueWithoutPlayersInput {
   data: MatchUpdateWithoutPlayersDataInput!
 }
 
+input MatchUpdateWithWhereUniqueWithoutPlayersOutInput {
+  where: MatchWhereUniqueInput!
+  data: MatchUpdateWithoutPlayersOutDataInput!
+}
+
 input MatchUpsertWithWhereUniqueWithoutPlayersInput {
   where: MatchWhereUniqueInput!
   update: MatchUpdateWithoutPlayersDataInput!
   create: MatchCreateWithoutPlayersInput!
+}
+
+input MatchUpsertWithWhereUniqueWithoutPlayersOutInput {
+  where: MatchWhereUniqueInput!
+  update: MatchUpdateWithoutPlayersOutDataInput!
+  create: MatchCreateWithoutPlayersOutInput!
 }
 
 input MatchWhereInput {
@@ -647,6 +722,9 @@ input MatchWhereInput {
   players_every: PlayerWhereInput
   players_some: PlayerWhereInput
   players_none: PlayerWhereInput
+  playersOut_every: PlayerWhereInput
+  playersOut_some: PlayerWhereInput
+  playersOut_none: PlayerWhereInput
 }
 
 input MatchWhereUniqueInput {
@@ -721,6 +799,7 @@ type Player implements Node {
   userType: UserType!
   reminders: Boolean!
   matchesPlayed(where: MatchWhereInput, orderBy: MatchOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Match!]
+  matchesOptedOut(where: MatchWhereInput, orderBy: MatchOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Match!]
   slackId: ID
 }
 
@@ -743,6 +822,12 @@ input PlayerCreateInput {
   reminders: Boolean!
   slackId: ID
   matchesPlayed: MatchCreateManyWithoutPlayersInput
+  matchesOptedOut: MatchCreateManyWithoutPlayersOutInput
+}
+
+input PlayerCreateManyWithoutMatchesOptedOutInput {
+  create: [PlayerCreateWithoutMatchesOptedOutInput!]
+  connect: [PlayerWhereUniqueInput!]
 }
 
 input PlayerCreateManyWithoutMatchesPlayedInput {
@@ -755,6 +840,17 @@ input PlayerCreateOneInput {
   connect: PlayerWhereUniqueInput
 }
 
+input PlayerCreateWithoutMatchesOptedOutInput {
+  name: String!
+  email: String!
+  username: String!
+  image: String
+  userType: UserType!
+  reminders: Boolean!
+  slackId: ID
+  matchesPlayed: MatchCreateManyWithoutPlayersInput
+}
+
 input PlayerCreateWithoutMatchesPlayedInput {
   name: String!
   email: String!
@@ -763,6 +859,7 @@ input PlayerCreateWithoutMatchesPlayedInput {
   userType: UserType!
   reminders: Boolean!
   slackId: ID
+  matchesOptedOut: MatchCreateManyWithoutPlayersOutInput
 }
 
 """An edge in a connection."""
@@ -1121,6 +1218,7 @@ input PlayerUpdateDataInput {
   reminders: Boolean
   slackId: ID
   matchesPlayed: MatchUpdateManyWithoutPlayersInput
+  matchesOptedOut: MatchUpdateManyWithoutPlayersOutInput
 }
 
 input PlayerUpdateInput {
@@ -1132,6 +1230,7 @@ input PlayerUpdateInput {
   reminders: Boolean
   slackId: ID
   matchesPlayed: MatchUpdateManyWithoutPlayersInput
+  matchesOptedOut: MatchUpdateManyWithoutPlayersOutInput
 }
 
 input PlayerUpdateManyDataInput {
@@ -1152,6 +1251,17 @@ input PlayerUpdateManyMutationInput {
   userType: UserType
   reminders: Boolean
   slackId: ID
+}
+
+input PlayerUpdateManyWithoutMatchesOptedOutInput {
+  create: [PlayerCreateWithoutMatchesOptedOutInput!]
+  connect: [PlayerWhereUniqueInput!]
+  disconnect: [PlayerWhereUniqueInput!]
+  delete: [PlayerWhereUniqueInput!]
+  update: [PlayerUpdateWithWhereUniqueWithoutMatchesOptedOutInput!]
+  updateMany: [PlayerUpdateManyWithWhereNestedInput!]
+  deleteMany: [PlayerScalarWhereInput!]
+  upsert: [PlayerUpsertWithWhereUniqueWithoutMatchesOptedOutInput!]
 }
 
 input PlayerUpdateManyWithoutMatchesPlayedInput {
@@ -1179,6 +1289,17 @@ input PlayerUpdateOneInput {
   upsert: PlayerUpsertNestedInput
 }
 
+input PlayerUpdateWithoutMatchesOptedOutDataInput {
+  name: String
+  email: String
+  username: String
+  image: String
+  userType: UserType
+  reminders: Boolean
+  slackId: ID
+  matchesPlayed: MatchUpdateManyWithoutPlayersInput
+}
+
 input PlayerUpdateWithoutMatchesPlayedDataInput {
   name: String
   email: String
@@ -1187,6 +1308,12 @@ input PlayerUpdateWithoutMatchesPlayedDataInput {
   userType: UserType
   reminders: Boolean
   slackId: ID
+  matchesOptedOut: MatchUpdateManyWithoutPlayersOutInput
+}
+
+input PlayerUpdateWithWhereUniqueWithoutMatchesOptedOutInput {
+  where: PlayerWhereUniqueInput!
+  data: PlayerUpdateWithoutMatchesOptedOutDataInput!
 }
 
 input PlayerUpdateWithWhereUniqueWithoutMatchesPlayedInput {
@@ -1197,6 +1324,12 @@ input PlayerUpdateWithWhereUniqueWithoutMatchesPlayedInput {
 input PlayerUpsertNestedInput {
   update: PlayerUpdateDataInput!
   create: PlayerCreateInput!
+}
+
+input PlayerUpsertWithWhereUniqueWithoutMatchesOptedOutInput {
+  where: PlayerWhereUniqueInput!
+  update: PlayerUpdateWithoutMatchesOptedOutDataInput!
+  create: PlayerCreateWithoutMatchesOptedOutInput!
 }
 
 input PlayerUpsertWithWhereUniqueWithoutMatchesPlayedInput {
@@ -1471,6 +1604,9 @@ input PlayerWhereInput {
   matchesPlayed_every: MatchWhereInput
   matchesPlayed_some: MatchWhereInput
   matchesPlayed_none: MatchWhereInput
+  matchesOptedOut_every: MatchWhereInput
+  matchesOptedOut_some: MatchWhereInput
+  matchesOptedOut_none: MatchWhereInput
 }
 
 input PlayerWhereUniqueInput {
@@ -1619,6 +1755,7 @@ input UserSubscriptionWhereInput {
 
 enum UserType {
   MANIFESTO
+  CONTRACTOR
   RINGER
 }
 

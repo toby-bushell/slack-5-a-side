@@ -7,10 +7,10 @@ module.exports = class OutSlash {
   async response(nextMatch, player) {
     try {
       // If they were not playing then don't update
-      const playerIsIn = nextMatch.players.some(
-        playerAlreadyIn => playerAlreadyIn.id === player.id
+      const playerIsOut = nextMatch.playersOut.some(
+        playerAlreadyOut => playerAlreadyOut.id === player.id
       );
-      if (!playerIsIn) {
+      if (playerIsOut) {
         return this.playerWasNotIn(nextMatch.players.length);
       }
 
@@ -26,19 +26,19 @@ module.exports = class OutSlash {
 
   playerIsOut(playerCount) {
     return {
-      text: `You're out... BOO!`,
+      text: `:thumbsdown: You're out... BOO!`,
       attachments: [
-        {
-          text: `Players playing: ${playerCount}`
-        }
+        { text: `Players so far: *${playerCount}*`, mrkdwn_in: ['text'] }
       ]
     };
   }
 
   playerWasNotIn(playerCount) {
     return {
-      text: `You were not playing!`,
-      attachments: [{ text: `Players playing: ${playerCount}` }]
+      text: `:thumbsdown: You were already not playing!`,
+      attachments: [
+        { text: `Players so far: *${playerCount}*`, mrkdwn_in: ['text'] }
+      ]
     };
   }
 
@@ -46,13 +46,34 @@ module.exports = class OutSlash {
     const where = { id: nextMatch.id };
     const playerId = player.id;
 
+    // If player had opted in before then also disconnect
+    const playerWasPlaying = nextMatch.players.some(
+      playerPlaying => playerPlaying.id === player.id
+    );
+    console.log('\x1b[32m', 'player was playing', playerWasPlaying, '\x1b[0m');
+
+    const data = playerWasPlaying
+      ? {
+          data: {
+            players: {
+              disconnect: { id: playerId }
+            },
+            playersOut: {
+              connect: { id: playerId }
+            }
+          }
+        }
+      : {
+          data: {
+            playersOut: {
+              connect: { id: playerId }
+            }
+          }
+        };
+
     return this.db.mutation.updateMatch(
       {
-        data: {
-          players: {
-            disconnect: { id: playerId }
-          }
-        },
+        data,
         where
       },
       '{ id time players { id name }}'

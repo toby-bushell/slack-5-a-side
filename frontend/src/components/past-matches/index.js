@@ -1,18 +1,12 @@
 import React, { Component } from 'react';
 import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
-import { Items, Row, RowHeader } from '../styles/list';
-import { Container } from '../styles/containers';
+
+import DeleteMatch from '../matches/delete-match';
+import moment from 'moment';
 import { formatToDay } from '../../utils/format-time';
 import { Link } from '@reach/router';
-import {
-  Accordion,
-  AccordionItem,
-  AccordionItemTitle,
-  AccordionItemBody
-} from 'react-accessible-accordion';
-import PlayersList from '../players/players-list';
-import moment from 'moment';
+import { List, Grid, ListItem, ListItemText, Button } from '@material-ui/core';
 
 const PAST_MATCHES_QUERY = gql`
   query PAST_MATCHES_QUERY($currentTime: DateTime!) {
@@ -42,31 +36,24 @@ class Matches extends Component {
             if (error) return <p>Error: {error.message}</p>;
 
             return (
-              <Container>
-                <h3>Past Matches</h3>
-                <Items>
-                  <RowHeader>
-                    <p>ID</p>
-                    <p>Time</p>
-                  </RowHeader>
-                  <Accordion>
-                    {data.matches.map(match => (
-                      <AccordionItem key={match.id}>
-                        <AccordionItemTitle>
-                          <Row key={match.id}>
-                            <p>{match.id}</p>
-                            <p>{formatToDay(match.time)}</p>
-                          </Row>
-                        </AccordionItemTitle>
-                        <AccordionItemBody>
-                          <PlayersList players={match.players} />
-                          <Link to={`/match/${match.id}`}>Edit Match</Link>
-                        </AccordionItemBody>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                </Items>
-              </Container>
+              <Grid>
+                <List>
+                  {data.matches.map(match => (
+                    <ListItem key={match.id}>
+                      <ListItemText>{formatToDay(match.time)}</ListItemText>
+
+                      <Button
+                        variant="contained"
+                        component={Link}
+                        to={`/match/${match.id}`}
+                      >
+                        View
+                      </Button>
+                      <DeleteMatch id={match.id} query="past" />
+                    </ListItem>
+                  ))}
+                </List>
+              </Grid>
             );
           }}
         </Query>

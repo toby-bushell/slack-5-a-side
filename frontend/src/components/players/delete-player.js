@@ -3,8 +3,8 @@ import { Mutation } from 'react-apollo';
 import gql from 'graphql-tag';
 // Queries
 import { ALL_PLAYERS_QUERY } from '../players';
-// Styled
-import { Button } from '../styles/buttons';
+// Material
+import { Button } from '@material-ui/core';
 
 const DELETE_PLAYER_MUTATION = gql`
   mutation DELETE_PLAYER_MUTATION($id: ID!) {
@@ -23,6 +23,8 @@ const DeletePlayer = ({ id }) => (
     {(deletePlayer, { loading, error }) => (
       <div>
         <Button
+          variant="contained"
+          color="secondary"
           onClick={async e => {
             const check = window.confirm('Want to delete?');
             if (!check) return;

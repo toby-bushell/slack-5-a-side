@@ -1,7 +1,7 @@
 const { WebClient } = require('@slack/client');
 const moment = require('moment');
-// An access token (from your Slack app or custom integration - xoxp, xoxb, or xoxa)
-const token = 'xoxb-18703011383-425949373157-pr8FbWDvwCX4LUojRBwmrhGV';
+require('dotenv').config({ path: 'variables.env' });
+const token = process.env.SLACK_TOKEN;
 const web = new WebClient(token);
 const Timeout = require('../utils/timeout.js');
 const db = require('../db');
@@ -9,10 +9,15 @@ const db = require('../db');
 module.exports = class Reminders {
   async setup(match) {
     if (!match) throw 'no match set';
+    console.log('\x1b[32m', 'setup match', match, '\x1b[0m');
 
     const { reminderTime, id } = match;
+
     // 1) work out timeout in seconds
     const timer = await this.getSecondsTillReminder(reminderTime);
+    console.log('\x1b[31m', 'timer', timer, reminderTime, '\x1b[0m');
+
+    if (timer < 0) return;
 
     // 2) create and set timeout with the matchId as the key
     const quickTimer = 2000;
@@ -30,16 +35,20 @@ module.exports = class Reminders {
     if (!match) throw 'No match id';
 
     // 2) Get list of players to send reminders to - in channel and not yet in for next match
-    const playersToSend = await this.getPlayersToSend(match.players);
-    console.log('\x1b[31m', 'players all ', playersToSend, '\x1b[0m');
+    const playersToSend = await this.getPlayersToSend(
+      match.players,
+      match.playersOut
+    );
+
+    console.log('\x1b[31m', 'players to send', playersToSend, '\x1b[0m');
 
     // 3) Send reminder to each player
-    playersToSend.forEach(player => {
-      this.sendMessage(player.slackId, match.id, formattedTime);
+    return playersToSend.forEach(player => {
+      this.sendMessage(player.slackId, match);
     });
   }
 
-  async sendMessage(slackId, match) {
+  async sendMessage(playerSlackId, match) {
     try {
       // 1) Format time to display in message
       const { time } = match;
@@ -47,7 +56,7 @@ module.exports = class Reminders {
 
       // 2) Send the reminder via slack
       const response = await web.chat.postMessage({
-        channel: slackId,
+        channel: playerSlackId,
         text: `Next match: *${formattedTime}*`,
         attachments: this.generateQuestion(match.id)
       });
@@ -57,7 +66,7 @@ module.exports = class Reminders {
     }
   }
 
-  async getPlayersToSend(confirmedPlayers) {
+  async getPlayersToSend(confirmedPlayers, playersOut) {
     const allPossible = await db.query
       .players(
         {
@@ -69,10 +78,19 @@ module.exports = class Reminders {
       )
       .catch(e => e);
 
+    // Combine all players in and players out as we don't want to send reminders to either
+    const playersToNotSend = [...confirmedPlayers, ...playersOut];
+
+    // console.log('playersToNotSend', playersToNotSend);
+    // console.log('allPossible', allPossible);
+
     // Return players that are not already confirmed for the upcoming match
     return allPossible.filter(possible => {
-      return confirmedPlayers.some(
-        confirmedPlayer => confirmedPlayer.id !== possible.id
+      return (
+        playersToNotSend.length === 0 ||
+        playersToNotSend.some(
+          playerToNotSend => playerToNotSend.id !== possible.id
+        )
       );
     });
   }
@@ -108,9 +126,11 @@ module.exports = class Reminders {
     const allPossible = await db.query
       .matches(
         { where: { time_gt: new Date() } },
-        `{id reminderTime players (orderBy:createdAt_DESC) { id name userType }}`
+        '{ id time reminderTime playersOut { id name userType } players (orderBy:createdAt_DESC) { id name userType }}'
       )
       .catch(e => e);
+
+    console.log('\x1b[31m', 'allPossible', allPossible, '\x1b[0m');
 
     // 2) Store all reminder promises in an array
     const reminderArray = allPossible.map(async match => {

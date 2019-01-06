@@ -7,7 +7,6 @@ import { PLAYERS_NOT_IN_MATCH } from '../upcoming-match/match';
 import { NEXT_MATCHES_QUERY } from '../upcoming-match';
 // Styled
 import Button from '@material-ui/core/Button';
-import { match } from '@reach/router/lib/utils';
 
 const ADD_PLAYER_TO_MATCH = gql`
   mutation ADD_PLAYER_TO_MATCH($id: ID!, $playerId: ID!) {
@@ -35,8 +34,6 @@ class AddToMatch extends Component {
       >
         {(addToMatch, { loading, error }) => (
           <div>
-            {console.log(matchId, playerId)}
-
             <Button
               color="primary"
               variant="contained"

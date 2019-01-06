@@ -18,10 +18,12 @@ type Mutation {
     koTime: DateTime!
     maxPlayers: Int!
     reminderTime: DateTime!
+    reminderDay: Int!
   ): AdminOption!
   signup(email: String!, password: String!, name: String!): User!
   signin(email: String!, password: String!): User!
   sendReminder(playerId: ID!, matchId: ID!): String!
+  updateUserType(id: ID!, type: UserType!): Player
 }
 type Channel {
   name: String!

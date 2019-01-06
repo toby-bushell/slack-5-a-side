@@ -1,11 +1,11 @@
 import React from 'react';
 import PleaseSignIn from '../components/please-sign-in';
-import UpcomingMatch from '../components/upcoming-match';
+import Matches from '../components/matches';
 
-const Home = () => (
+const MatchesPage = props => (
   <PleaseSignIn>
-    <UpcomingMatch />
+    <Matches />
   </PleaseSignIn>
 );
 
-export default Home;
+export default MatchesPage;

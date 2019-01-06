@@ -1,5 +1,6 @@
 enum UserType {
   MANIFESTO
+  CONTRACTOR
   RINGER
 }
 
@@ -27,7 +28,8 @@ type Player {
   image: String
   userType: UserType!
   reminders: Boolean!
-  matchesPlayed: [Match!]!
+  matchesPlayed: [Match!]! @relation(name: "PlayersInMatch")
+  matchesOptedOut: [Match!]! @relation(name: "PlayersNotInMatch")
   slackId: ID
 }
 
@@ -36,7 +38,8 @@ type Match {
   time: DateTime
   reminderTime: DateTime
   remindersSent: [ID!]!
-  players: [Player!]!
+  players: [Player!]! @relation(name: "PlayersInMatch")
+  playersOut: [Player!]! @relation(name: "PlayersNotInMatch")
 }
 
 type AdminOption {
@@ -44,4 +47,5 @@ type AdminOption {
   koTime: String!
   maxPlayers: Int!
   reminderTime: String
+  reminderDay: Int
 }

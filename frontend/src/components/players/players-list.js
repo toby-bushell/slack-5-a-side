@@ -1,70 +1,166 @@
-import React, { Fragment } from 'react';
+import React, { Component, Fragment } from 'react';
 import DeletePlayer from './delete-player';
+import ChangeUserType from './change-player-type';
 import AddToMatch from './add-to-match';
 import RemindPlayer from './remind-player';
 import RemoveFromMatch from '../players/remove-from-match';
-import { Items, Row, RowHeader } from '../styles/list';
+import SlackAvatar from '../slack-avatar';
 
 // Material
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Typography from '@material-ui/core/Typography';
+import {
+  List,
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
+  AppBar,
+  Tabs,
+  Tab,
+  Avatar,
+  Typography,
+  Toolbar
+} from '@material-ui/core';
 
-const PlayersList = ({
-  players,
-  notInUpcomingMatch = false,
-  removeFromUpcoming = false,
-  deletePossible = false,
-  matchId = null
-}) => (
-  <Table style={{ width: '100%' }}>
-    {players.length > 0 && (
-      <TableHead>
-        <TableRow>
-          <TableCell>ID</TableCell>
-          <TableCell>Name</TableCell>
-          <TableCell />
-        </TableRow>
-      </TableHead>
-    )}
-    <TableBody>
-      {players.length > 0 ? (
-        players.map(player => (
-          <TableRow key={player.id}>
-            <TableCell>{player.id}</TableCell>
-            <TableCell>{player.name}</TableCell>
+import ArrowDownward from '@material-ui/icons/ArrowDownward';
+import ArrowUpward from '@material-ui/icons/ArrowUpward';
+
+class PlayersList extends Component {
+  state = {
+    value: 0,
+    playedOrder: 'DESC'
+  };
+
+  handleChange = async (event, value) => {
+    if (value === 3) {
+      // Await for state to be set
+      await this.updateSortOrder();
+      console.log('state after', this.state);
+    } else {
+      this.setState({ value });
+    }
+  };
+
+  updateSortOrder = async () => {
+    const { playedOrder } = this.state;
+
+    console.log('playedOrder', playedOrder);
+
+    if (playedOrder === 'DESC') {
+      this.setState({ playedOrder: 'ASC' }, () => true);
+    } else {
+      this.setState({ playedOrder: 'DESC' }, () => true);
+    }
+  };
+  sortByPlayed = () => {
+    const { playedOrder } = this.state;
+    const { players } = this.props;
+    let sortedPlayers = [...this.props.players];
+    console.log('sort by played firing', this.state);
+
+    if (playedOrder === 'DESC') {
+      sortedPlayers = [...players].sort((a, b) => {
+        return 1 - a.matchesPlayed.length - b.matchesPlayed.length;
+      });
+    } else {
+      sortedPlayers = [...players].sort((a, b) => {
+        return a.matchesPlayed.length - b.matchesPlayed.length;
+      });
+    }
+    return sortedPlayers;
+  };
+
+  render() {
+    const {
+      notInUpcomingMatch = false,
+      removeFromUpcoming = false,
+      deletePossible = false,
+      matchId = null,
+      playedSort = false
+    } = this.props;
+
+    const { value, playedOrder } = this.state;
+    let { players } = this.props;
+    console.log('players', this.state);
+
+    if (playedSort) players = this.sortByPlayed();
+
+    const playerList = items =>
+      items.length > 0 ? (
+        items.map(player => (
+          <ListItem key={player.id}>
+            <ListItemAvatar>
+              <SlackAvatar player={player} />
+            </ListItemAvatar>
+            <ListItemText primary={player.name} />
             {notInUpcomingMatch && (
               <Fragment>
-                <TableCell>
+                {player.userType !== 'RINGER' && (
                   <RemindPlayer playerId={player.id} matchId={matchId} />
-                </TableCell>
+                )}
 
-                <TableCell>
-                  <AddToMatch playerId={player.id} matchId={matchId} />
-                </TableCell>
+                <AddToMatch playerId={player.id} matchId={matchId} />
               </Fragment>
             )}
 
-            {/* {deletePossible && (
-                <DeletePlayer id={player.id} matchId={removePossible} />
-              )} */}
-            {removeFromUpcoming && matchId && (
-              <TableCell>
-                <RemoveFromMatch playerId={player.id} matchId={matchId} />
-              </TableCell>
+            {deletePossible && (
+              // Is therefore the player management list
+              <Fragment>
+                <ChangeUserType id={player.id} type={player.userType} />
+                <DeletePlayer id={player.id} matchId={matchId} />
+              </Fragment>
             )}
-          </TableRow>
+            {removeFromUpcoming && matchId && (
+              <RemoveFromMatch playerId={player.id} matchId={matchId} />
+            )}
+            {playedSort && (
+              <Avatar style={{ marginLeft: '20px' }}>
+                {player.matchesPlayed.length}
+              </Avatar>
+            )}
+          </ListItem>
         ))
       ) : (
-        <TableRow>
-          <TableCell>no players</TableCell>
-        </TableRow>
-      )}
-    </TableBody>
-  </Table>
-);
+        <Toolbar style={{ paddingLeft: '0' }}>
+          <Typography variant="h6">No players</Typography>
+        </Toolbar>
+      );
 
+    const manifesto = players.filter(player => player.userType === 'MANIFESTO');
+    const contractors = players.filter(
+      player => player.userType === 'CONTRACTOR'
+    );
+    const ringers = players.filter(player => player.userType === 'RINGER');
+
+    return (
+      <div style={{ width: '100%' }}>
+        <AppBar position="static">
+          <Tabs value={value} onChange={this.handleChange}>
+            <Tab label="Manifestonian" />
+            <Tab label="Contractor" />
+            <Tab label="Ringer" />
+            {playedSort && (
+              <Tab
+                style={{ marginLeft: 'auto', minWidth: '100px' }}
+                label="Played"
+                icon={
+                  playedOrder === 'DESC' ? (
+                    <ArrowDownward
+                      style={{ fontSize: '1em', marginLeft: '5px' }}
+                    />
+                  ) : (
+                    <ArrowUpward
+                      style={{ fontSize: '1em', marginLeft: '5px' }}
+                    />
+                  )
+                }
+              />
+            )}
+          </Tabs>
+        </AppBar>
+        {value === 0 && <List>{playerList(manifesto)}</List>}
+        {value === 1 && <List>{playerList(contractors)}</List>}
+        {value === 2 && <List>{playerList(ringers)}</List>}
+      </div>
+    );
+  }
+}
 export default PlayersList;

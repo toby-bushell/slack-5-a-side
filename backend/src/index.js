@@ -12,9 +12,6 @@ server.express.use(cookieParser());
 // decode the JWT so we can get the user Id on each request
 server.express.use((req, res, next) => {
   const { token } = req.cookies;
-  console.log('\x1b[31m', 'cookies', req.cookies, '\x1b[0m');
-  console.log('\x1b[31m', 'env', process.env, '\x1b[0m');
-
   if (token) {
     const { userId } = jwt.verify(token, process.env.APP_SECRET);
     // put the userId onto the req for future requests to access
@@ -33,6 +30,7 @@ server.express.use(async (req, res, next) => {
     '{ id, permissions, email, name }'
   );
   req.user = user;
+
   next();
 });
 
@@ -50,4 +48,6 @@ server.start(
     console.log(`server is running on port http://localhost:${details.port}`);
   }
 );
+
+// Include the rest API that is used to interact with slack
 require('./slack/index');

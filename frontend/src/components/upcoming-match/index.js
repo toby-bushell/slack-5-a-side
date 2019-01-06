@@ -3,11 +3,10 @@ import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
 import Match from './match';
 import moment from 'moment';
+import { Link } from '@reach/router';
 
 // Material
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import Toolbar from '@material-ui/core/Toolbar';
+import { Grid, Typography, Button, Card, CardContent } from '@material-ui/core';
 
 const ALL_MATCHES_QUERY = gql`
   query ALL_MATCHES_QUERY {
@@ -42,26 +41,40 @@ const NEXT_MATCHES_QUERY = gql`
 class Matches extends Component {
   render() {
     return (
-      <div>
-        <Query
-          query={NEXT_MATCHES_QUERY}
-          variables={{ currentTime: moment().startOf('day') }}
-        >
-          {({ data, error, loading }) => {
-            console.log('loading', loading, data);
-            if (loading) return <p>Loading...</p>;
-            if (error) return <p>Error: {error.message}</p>;
+      <Query
+        query={NEXT_MATCHES_QUERY}
+        variables={{ currentTime: moment().startOf('day') }}
+      >
+        {({ data, error, loading }) => {
+          console.log('loading', loading, data);
+          if (loading) return <p>Loading...</p>;
+          if (error) return <p>Error: {error.message}</p>;
 
+          if (data.matches && data.matches.length === 0) {
             return (
               <Grid>
-                {data.matches.map(match => (
-                  <Match key={match.id} match={match} />
-                ))}
+                <Card style={{ marginBottom: '30px' }}>
+                  <CardContent>
+                    <Typography variant={'h5'} style={{ marginBottom: '30px' }}>
+                      No upcoming match, create one?
+                    </Typography>
+                    <Button variant="contained" component={Link} to="/matches">
+                      Create match
+                    </Button>
+                  </CardContent>
+                </Card>
               </Grid>
             );
-          }}
-        </Query>
-      </div>
+          }
+          return (
+            <Grid>
+              {data.matches.map(match => (
+                <Match key={match.id} match={match} />
+              ))}
+            </Grid>
+          );
+        }}
+      </Query>
     );
   }
 }

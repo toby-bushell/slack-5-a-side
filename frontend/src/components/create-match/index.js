@@ -2,11 +2,18 @@ import React, { Component } from 'react';
 import { Mutation } from 'react-apollo';
 import gql from 'graphql-tag';
 import moment from 'moment';
+import Message from '../message';
 // Queries
-import { NEXT_MATCHES_QUERY } from '../upcoming-match';
+import { FUTURE_MATCHES_QUERY } from '../future-matches';
 // Styles
-import { Form } from '../styles/forms';
-import { Container } from '../styles/containers';
+import {
+  Card,
+  CardContent,
+  TextField,
+  Typography,
+  Button,
+  FormControl
+} from '@material-ui/core/';
 
 const CREATE_MATCH_MUTATION = gql`
   mutation CREATE_MATCH_MUTATION($time: DateTime!) {
@@ -17,13 +24,19 @@ const CREATE_MATCH_MUTATION = gql`
         id
         name
       }
+      playersOut {
+        id
+        name
+      }
     }
   }
 `;
 
 class CreateMatch extends Component {
   state = {
-    time: ''
+    time: '',
+    message: '',
+    error: false
   };
 
   handleChange = e => {
@@ -33,52 +46,79 @@ class CreateMatch extends Component {
   };
 
   render() {
+    const { message } = this.state;
     return (
       <Mutation
         mutation={CREATE_MATCH_MUTATION}
-        variables={this.state}
+        variables={{ time: this.state.time }}
         awaitRefetchQueries
         refetchQueries={[
           {
-            query: NEXT_MATCHES_QUERY,
+            query: FUTURE_MATCHES_QUERY,
             variables: { currentTime: moment().startOf('day') }
           }
         ]}
       >
-        {(createMatch, { loading, error }) => (
-          <Container>
-            <Form
-              data-test="form"
-              onSubmit={async e => {
-                e.preventDefault();
-                console.log('submitting', this.state);
-
-                const res = await createMatch();
-                console.log('response', res);
-              }}
-            >
-              <h3>Create match</h3>
-              <p>{error}</p>
-              <fieldset disabled={loading} aria-busy={loading}>
-                <div className="field">
-                  <label htmlFor="time" className="label">
-                    Day
-                    <input
-                      type="date"
-                      id="time"
+        {(createMatch, { loading, error }) => {
+          return (
+            <Card style={{ marginBottom: '40px' }}>
+              {message && (
+                <Message
+                  text={message}
+                  variant={error || this.state.error ? 'error' : null}
+                />
+              )}
+              <CardContent>
+                <form
+                  data-test="form"
+                  onSubmit={async e => {
+                    e.preventDefault();
+                    try {
+                      await createMatch();
+                      this.setState({
+                        message: 'Match successfully created',
+                        error: false
+                      });
+                    } catch (e) {
+                      this.setState({
+                        message: e.message,
+                        error: true
+                      });
+                      console.log('error in creating', e);
+                    }
+                  }}
+                >
+                  <Typography variant={'h4'} gutterBottom>
+                    Create match
+                  </Typography>
+                  <FormControl>
+                    <TextField
+                      id="date"
                       name="time"
-                      placeholder="Name"
-                      required
-                      value={this.state.name}
+                      label="Date"
+                      type="date"
+                      value={this.state.time}
+                      InputLabelProps={{ shrink: true }}
                       onChange={this.handleChange}
+                      style={{ marginBottom: '20px' }}
+                      required
                     />
-                  </label>
-                </div>
-                <button type="submit">Submit</button>
-              </fieldset>
-            </Form>
-          </Container>
-        )}
+                  </FormControl>
+                  <div>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      color="primary"
+                      disabled={loading}
+                    >
+                      Creat{loading ? 'ing' : 'e'} Match
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          );
+        }}
       </Mutation>
     );
   }

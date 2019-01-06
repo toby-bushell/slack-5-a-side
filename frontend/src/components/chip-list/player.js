@@ -1,12 +1,12 @@
 import React, { Component, Fragment } from 'react';
+import moment from 'moment';
 import { Mutation } from 'react-apollo';
 import gql from 'graphql-tag';
-import moment from 'moment';
 // Queries
 import { NEXT_MATCHES_QUERY } from '../upcoming-match';
 import { PLAYERS_NOT_IN_MATCH } from '../upcoming-match/match';
 // Material
-import { Button } from '@material-ui/core';
+import { Chip, Avatar } from '@material-ui/core';
 
 const REMOVE_PLAYER_FROM_MATCH = gql`
   mutation REMOVE_PLAYER_FROM_MATCH($id: ID!, $playerId: ID!) {
@@ -16,9 +16,9 @@ const REMOVE_PLAYER_FROM_MATCH = gql`
   }
 `;
 
-class RemoveFromMatch extends Component {
+class Player extends Component {
   update = (cache, payload) => {
-    console.log('this props ', this.props);
+    const { id: playerId } = this.props.player;
 
     // manually update the cache on the client, so it matches the server
     // 1. Read the cache for the matches we want
@@ -30,8 +30,8 @@ class RemoveFromMatch extends Component {
     data.matches.forEach(match => {
       console.log('match loop', match);
       const updatedPlayers = match.players.filter(player => {
-        console.log('each player', player, this.props.playerId);
-        return player.id !== this.props.playerId;
+        console.log('each player', player, playerId);
+        return player.id !== playerId;
       });
 
       match.players = updatedPlayers;
@@ -45,11 +45,16 @@ class RemoveFromMatch extends Component {
     });
   };
   render() {
-    const { matchId, playerId } = this.props;
+    const { matchId, player } = this.props;
+    const avatar = player.image ? (
+      <Avatar src={player.image} />
+    ) : (
+      <Avatar>R</Avatar>
+    );
     return (
       <Mutation
         mutation={REMOVE_PLAYER_FROM_MATCH}
-        variables={{ id: matchId, playerId }}
+        variables={{ id: matchId, playerId: player.id }}
         update={this.update}
         awaitRefetchQueries
         refetchQueries={[
@@ -58,18 +63,12 @@ class RemoveFromMatch extends Component {
       >
         {(removeFromMatch, { loading, error }) => (
           <Fragment>
-            {console.log(matchId, playerId)}
-
-            <Button
-              color="secondary"
-              variant="contained"
-              onClick={async e => {
-                const res = await removeFromMatch();
-                console.log('add response', res);
-              }}
-            >
-              {loading ? 'REMOVING' : 'REMOVE FROM MATCH'}
-            </Button>
+            <Chip
+              label={player.name}
+              onDelete={removeFromMatch}
+              avatar={avatar}
+              style={{ margin: '10px' }}
+            />
           </Fragment>
         )}
       </Mutation>
@@ -77,5 +76,5 @@ class RemoveFromMatch extends Component {
   }
 }
 
-export default RemoveFromMatch;
+export default Player;
 export { REMOVE_PLAYER_FROM_MATCH };

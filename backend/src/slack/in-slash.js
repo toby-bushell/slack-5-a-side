@@ -29,22 +29,18 @@ module.exports = class InSlash {
 
   playerIsIn(playerCount) {
     return {
-      text: `You're in!`,
+      text: `:+1: Wooo you're in!`,
       attachments: [
-        {
-          text: `Players so far: ${playerCount}`
-        }
+        { text: `Players so far: *${playerCount}*`, mrkdwn_in: ['text'] }
       ]
     };
   }
 
   playerAlreadyIn(playerCount) {
     return {
-      text: `You're already in!`,
+      text: `:+1: You're already in!`,
       attachments: [
-        {
-          text: `Players so far: ${playerCount}`
-        }
+        { text: `Players so far: *${playerCount}*`, mrkdwn_in: ['text'] }
       ]
     };
   }
@@ -65,14 +61,34 @@ module.exports = class InSlash {
     const playerId = player.id;
     const where = { id: id };
 
-    try {
-      const UpdateMatch = await this.db.mutation.updateMatch(
-        {
+    // If player had opted out before then also connect to players out
+    const playerWasNotPlaying = nextMatch.playersOut.some(
+      playerNotPlaying => playerNotPlaying.id === player.id
+    );
+
+    const data = playerWasNotPlaying
+      ? {
           data: {
             players: {
               connect: { id: playerId }
+            },
+            playersOut: {
+              disconnect: { id: playerId }
             }
-          },
+          }
+        }
+      : {
+          data: {
+            playersOut: {
+              connect: { id: playerId }
+            }
+          }
+        };
+
+    try {
+      const UpdateMatch = await this.db.mutation.updateMatch(
+        {
+          data,
           where
         },
         '{ id time players { id name }}'
@@ -83,41 +99,3 @@ module.exports = class InSlash {
     }
   }
 };
-
-//   try {
-//     const playerAdded = await DB.updatePlayersMatch(
-//       user_id,
-//       user_name,
-//       'player',
-//       true
-//     );
-//     const { active } = playerAdded;
-
-//     // If active is false then return a message that there is no game
-//     if (!active) {
-//       const response = {
-//         text: `No game this week`,
-//         attachments: [
-//           {
-//             text: `We are either between seasons or Matt might have mucked up`
-//           }
-//         ]
-//       };
-
-//       return response;
-//     }
-
-//     const { playerCount } = playerAdded;
-//     const response = {
-//       text: `You're in!`,
-//       attachments: [
-//         {
-//           text: `Players so far: ${playerCount}`
-//         }
-//       ]
-//     };
-//     return response;
-//   } catch (error) {
-//     console.log('\x1b[31m', 'error', error, '\x1b[0m');
-//     return error;
-//   }

@@ -2,34 +2,28 @@ import React from 'react';
 import { Link } from '@reach/router';
 
 // Material Ui
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import List from '@material-ui/core/List';
-import Drawer from '@material-ui/core/Drawer';
-import Hidden from '@material-ui/core/Hidden';
+import { ListItem, ListItemText, List } from '@material-ui/core';
 
-const Header = () => {
-  return (
-    <nav>
-      <List>
-        <Link to="/">
-          <ListItem button>
-            <ListItemText>Home</ListItemText>
-          </ListItem>
-        </Link>
-        <Link to="players">
-          <ListItem button>
-            <ListItemText>Players</ListItemText>
-          </ListItem>
-        </Link>
-        <Link to="upcoming-matches">
-          <ListItem button>
-            <ListItemText>Upcoming Matches</ListItemText>
-          </ListItem>
-        </Link>
-      </List>
-    </nav>
-  );
-};
+const Nav = () => (
+  <nav style={{ height: '100%', backgroundColor: '#efefef' }}>
+    <List>
+      <ListItem button component={Link} to="/">
+        <ListItemText>Home</ListItemText>
+      </ListItem>
+      <ListItem button component={Link} to="players">
+        <ListItemText>Players</ListItemText>
+      </ListItem>
+      <ListItem button component={Link} to="matches">
+        <ListItemText>Matches</ListItemText>
+      </ListItem>
+      <ListItem button component={Link} to="create-ringer">
+        <ListItemText>Add ringer</ListItemText>
+      </ListItem>
+      <ListItem button component={Link} to="admin-options">
+        <ListItemText>Admin</ListItemText>
+      </ListItem>
+    </List>
+  </nav>
+);
 
-export default Header;
+export default Nav;

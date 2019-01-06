@@ -3,6 +3,8 @@ import { Query, Mutation } from 'react-apollo';
 import gql from 'graphql-tag';
 import { adopt } from 'react-adopt';
 import OptionsFrom from './options-form';
+// Material
+import { Grid } from '@material-ui/core';
 
 const ADMIN_OPTIONS = gql`
   query ADMIN_OPTIONS {
@@ -11,6 +13,7 @@ const ADMIN_OPTIONS = gql`
       koTime
       maxPlayers
       reminderTime
+      reminderDay
     }
   }
 `;
@@ -20,15 +23,18 @@ const SET_ADMIN_OPTIONS = gql`
     $koTime: DateTime!
     $maxPlayers: Int!
     $reminderTime: DateTime!
+    $reminderDay: Int!
   ) {
     setAdminOptions(
       koTime: $koTime
       maxPlayers: $maxPlayers
       reminderTime: $reminderTime
+      reminderDay: $reminderDay
     ) {
       koTime
       maxPlayers
       reminderTime
+      reminderDay
     }
   }
 `;
@@ -44,19 +50,33 @@ const Composed = adopt({
 class AdminOptions extends Component {
   render() {
     return (
-      <div>
-        <Composed>
-          {({ adminOptions, setAdminOptions }) => {
-            if (adminOptions.loading) return <p>Loading ...</p>;
-            return (
+      <Composed>
+        {({ adminOptions, setAdminOptions }) => {
+          if (adminOptions.loading) return <p>Loading ...</p>;
+          if (adminOptions.error)
+            return <p>Error: {adminOptions.error.message}</p>;
+
+          return (
+            <Grid
+              item
+              xs={12}
+              spacing={16}
+              container
+              style={{
+                display: 'flex',
+                padding: '0 14px',
+                marginBottom: '40px',
+                flexWrap: 'wrap'
+              }}
+            >
               <OptionsFrom
                 adminOptions={adminOptions}
                 setAdminOptions={setAdminOptions}
               />
-            );
-          }}
-        </Composed>
-      </div>
+            </Grid>
+          );
+        }}
+      </Composed>
     );
   }
 }

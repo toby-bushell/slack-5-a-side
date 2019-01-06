@@ -1,17 +1,34 @@
 const { WebClient } = require('@slack/client');
 // An access token (from your Slack app or custom integration - xoxp, xoxb, or xoxa)
-const token = 'xoxb-18703011383-425949373157-pr8FbWDvwCX4LUojRBwmrhGV';
+require('dotenv').config({ path: 'variables.env' });
+const token = process.env.SLACK_TOKEN;
 const web = new WebClient(token);
 
-const { forwardTo } = require('prisma-binding');
-const reminders = require('../slack/reminders');
-const Reminders = new reminders();
-
 const Query = {
-  players: forwardTo('db'),
-  matches: forwardTo('db'),
-  match: forwardTo('db'),
-  adminOptions: forwardTo('db'),
+  players(parent, args, ctx, info) {
+    if (!ctx.request.userId) {
+      throw new Error('You must be logged in to do that!');
+    }
+    return ctx.db.query.players(args, info);
+  },
+  matches(parent, args, ctx, info) {
+    if (!ctx.request.userId) {
+      throw new Error('You must be logged in to do that!');
+    }
+    return ctx.db.query.matches(args, info);
+  },
+  match(parent, args, ctx, info) {
+    if (!ctx.request.userId) {
+      throw new Error('You must be logged in to do that!');
+    }
+    return ctx.db.query.match(args, info);
+  },
+  adminOptions(parent, args, ctx, info) {
+    if (!ctx.request.userId) {
+      throw new Error('You must be logged in to do that!');
+    }
+    return ctx.db.query.adminOptions(args, info);
+  },
   me(parent, args, ctx, info) {
     // check if there is a current user ID
     if (!ctx.request.userId) {
@@ -25,6 +42,9 @@ const Query = {
     );
   },
   async nextMatch(parent, args, ctx, info) {
+    if (!ctx.request.userId) {
+      throw new Error('You must be logged in to do that!');
+    }
     const currentDate = new Date();
     const nextMatch = await ctx.db.query.matches(
       {
@@ -35,7 +55,6 @@ const Query = {
       info
     );
 
-    Reminders.setup(nextMatch[0]);
     return nextMatch;
   },
   async channels(parent, args, ctx, info) {

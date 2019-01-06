@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { Mutation } from 'react-apollo';
 import gql from 'graphql-tag';
 import { CURRENT_USER_QUERY } from '../user';
-import { log } from 'async';
+import { Typography, TextField, Button } from '@material-ui/core';
+import { navigate } from '@reach/router';
 
 const SIGNIN_MUTATION = gql`
   mutation SIGNIN_MUTATION($email: String!, $password: String!) {
@@ -35,37 +36,53 @@ class SignIn extends Component {
             method="post"
             onSubmit={async e => {
               e.preventDefault();
-              const response = await signup();
-              console.log(response);
-              this.setState({ name: '', email: '', password: '' });
+              try {
+                const response = await signup();
+                console.log(response);
+                this.setState({ name: '', email: '', password: '' });
+                navigate('/');
+              } catch (e) {
+                console.log('error in signup', e);
+              }
             }}
           >
-            <fieldset disabled={loading} aria-busy={loading}>
-              <h2>Sign into your account</h2>
-              {/* <Error error={error} /> */}
-              <label htmlFor="email">
-                Email
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="email"
-                  value={this.state.email}
-                  onChange={this.saveToState}
-                />
-              </label>
-              <label htmlFor="password">
-                Password
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="password"
-                  value={this.state.password}
-                  onChange={this.saveToState}
-                />
-              </label>
+            <Typography variant={'h4'} gutterBottom>
+              Sign into your account
+            </Typography>
+            {/* <Error error={error} /> */}
+            <div htmlFor="email">
+              <TextField
+                type="email"
+                name="email"
+                placeholder="email"
+                InputLabelProps={{ shrink: true }}
+                label="Email"
+                value={this.state.email}
+                onChange={this.saveToState}
+                style={{ marginBottom: '20px' }}
+              />
+            </div>
+            <div htmlFor="password">
+              <TextField
+                type="password"
+                name="password"
+                placeholder="password"
+                value={this.state.password}
+                onChange={this.saveToState}
+                label={'Password'}
+                style={{ marginBottom: '20px' }}
+                InputLabelProps={{ shrink: true }}
+              />
+            </div>
 
-              <button type="submit">Sign In!</button>
-            </fieldset>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              disabled={loading}
+            >
+              Sign In!
+            </Button>
           </form>
         )}
       </Mutation>

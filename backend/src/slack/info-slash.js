@@ -8,7 +8,6 @@ module.exports = class InfoSlash {
 
   async response(nextMatch) {
     // Respond with time and date of next match and a list of players that are playing
-    console.log('\x1b[31m', 'info respons', '\x1b[0m');
 
     // 1) Get the time set in admin options
     const adminOptionsArray = await this.db.query.adminOptions();

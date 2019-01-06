@@ -1,10 +1,8 @@
 import React from 'react';
 import { Mutation } from 'react-apollo';
 import gql from 'graphql-tag';
-// Queries
-import { NEXT_MATCHES_QUERY } from '../upcoming-match';
 // Styled
-import Button from '@material-ui/core/Button';
+import { Button } from '@material-ui/core';
 
 const REMIND_PLAYER = gql`
   mutation REMIND_PLAYER($matchId: ID!, $playerId: ID!) {

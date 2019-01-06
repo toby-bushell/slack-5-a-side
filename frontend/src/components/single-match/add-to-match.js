@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import Select from 'react-select';
 import { Mutation } from 'react-apollo';
 import gql from 'graphql-tag';
-
 // Queries
 import { ALL_MATCHES_QUERY } from '../upcoming-match';
 import { GET_MATCH_QUERY } from './index';
