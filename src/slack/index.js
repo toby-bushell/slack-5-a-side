@@ -141,7 +141,9 @@ app.post('/slack/interactive', async (req, res) => {
   return res.json(messageToRespond);
 });
 
-server.listen(3001, async () => {
+const port = process.env.PORT || 3001;
+
+server.listen(port, async () => {
   console.log(`Find the server at: http://localhost:3001/`); // eslint-disable-line no-console
   const Reminders = new reminders(db);
   Reminders.setAllReminders();
