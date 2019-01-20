@@ -1,0 +1,8 @@
+#endpoint: ${env:PRISMA_ENDPOINT}
+#endpoint: https://fiveaside-prod-a0979fe955.herokuapp.com/5aside-prod/5aside-prod
+endpoint: https://fiveaside-prod-a0979fe955.herokuapp.com/prod-5aside/stage-5aside
+datamodel: datamodel.prisma
+# secret: ${env:PRISMA_SECRET}
+hooks:
+  post-deploy:
+      - graphql get-schema -p prisma
