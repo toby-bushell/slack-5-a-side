@@ -33,6 +33,7 @@ const NEXT_MATCHES_QUERY = gql`
         name
         username
         image
+        userType
       }
     }
   }

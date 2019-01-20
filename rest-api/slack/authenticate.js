@@ -32,6 +32,8 @@ module.exports = function(req, res, next) {
 
     next();
   } else {
+    console.log('error');
+
     return res.status(400).send('Verification failed');
   }
 };

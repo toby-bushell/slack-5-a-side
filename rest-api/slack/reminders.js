@@ -4,9 +4,12 @@ require('dotenv').config({ path: 'variables.env' });
 const token = process.env.SLACK_TOKEN;
 const web = new WebClient(token);
 const Timeout = require('../utils/timeout.js');
-const db = require('../db');
 
 module.exports = class Reminders {
+  constructor(graphQLClient) {
+    this.graphQl = graphQLClient;
+  }
+
   async setup(match) {
     if (!match) throw 'no match set';
     console.log('\x1b[32m', 'setup match', match, '\x1b[0m');
@@ -36,8 +39,8 @@ module.exports = class Reminders {
 
     // 2) Get list of players to send reminders to - in channel and not yet in for next match
     const playersToSend = await this.getPlayersToSend(
-      match.players,
-      match.playersOut
+      match.players || [],
+      match.playersOut || []
     );
 
     console.log('\x1b[31m', 'players to send', playersToSend, '\x1b[0m');
@@ -67,16 +70,16 @@ module.exports = class Reminders {
   }
 
   async getPlayersToSend(confirmedPlayers, playersOut) {
-    const allPossible = await db.query
-      .players(
-        {
-          where: {
-            userType: 'MANIFESTO'
-          }
-        },
-        `{id name slackId}`
-      )
-      .catch(e => e);
+    const query = `query{
+      players(where: {userType: MANIFESTO}) {
+        id name slackId
+        }
+      }`;
+
+    const playersResponse = await this.graphQl.request(query).catch(e => {
+      throw e;
+    });
+    const allPossible = playersResponse.players;
 
     // Combine all players in and players out as we don't want to send reminders to either
     const playersToNotSend = [...confirmedPlayers, ...playersOut];
@@ -123,17 +126,24 @@ module.exports = class Reminders {
 
   async setAllReminders() {
     // 1) get all future matches
-    const allPossible = await db.query
-      .matches(
-        { where: { time_gt: new Date() } },
-        '{ id time reminderTime playersOut { id name userType } players (orderBy:createdAt_DESC) { id name userType }}'
-      )
-      .catch(e => e);
+    const query = `query{
+      futureMatches {
+        id 
+        time 
+        reminderTime 
+        playersOut { id name userType }
+        players (orderBy:createdAt_DESC) { id name userType }
+        }
+      }`;
 
-    console.log('\x1b[31m', 'allPossible', allPossible, '\x1b[0m');
+    const futureMatchesResponse = await this.graphQl.request(query).catch(e => {
+      throw e;
+    });
+
+    const matches = futureMatchesResponse.futureMatches;
 
     // 2) Store all reminder promises in an array
-    const reminderArray = allPossible.map(async match => {
+    const reminderArray = matches.map(async match => {
       const reminder = await this.setup(match);
       return reminder;
     });

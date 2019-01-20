@@ -23,7 +23,6 @@ const AuthenticateSlack = require('./authenticate');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false })); // support encoded bodies
 
-app.use(AuthenticateSlack);
 
 /**
  * Handle slash commands

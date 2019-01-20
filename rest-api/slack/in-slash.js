@@ -1,16 +1,18 @@
 module.exports = class InSlash {
-  constructor(db, body) {
-    this.db = db;
+  constructor(graphQLClient, body) {
+    this.graphQl = graphQLClient;
     this.body = body;
   }
 
   async response(nextMatch, player) {
+    console.log('\x1b[34m', 'firing', '\x1b[0m');
+
     try {
       // If already playing don't bother adding
       const playerIsIn = nextMatch.players.some(
         playerAlreadyIn => playerAlreadyIn.id === player.id
       );
-      if (playerIsIn) return this.playerAlreadyIn(nextMatch.players.length);
+      if (playerIsIn) return this.playerAlreadyIn(nextMatch.players);
 
       const updatedMatch = await this.addToMatch(nextMatch, player);
       const playersInMatch = updatedMatch.players;
@@ -31,16 +33,28 @@ module.exports = class InSlash {
     return {
       text: `:+1: Wooo you're in!`,
       attachments: [
-        { text: `Players so far: *${playerCount}*`, mrkdwn_in: ['text'] }
+        {
+          text: `Players so far: *${playerCount}*\n${this.playersList(
+            players
+          )}`,
+          mrkdwn_in: ['text']
+        }
       ]
     };
   }
 
-  playerAlreadyIn(playerCount) {
+  playerAlreadyIn(players) {
+    console.log('\x1b[32m', 'already in', players, '\x1b[0m');
+
     return {
       text: `:+1: You're already in!`,
       attachments: [
-        { text: `Players so far: *${playerCount}*`, mrkdwn_in: ['text'] }
+        {
+          text: `Players so far: *${players.length}*\n${this.playersList(
+            players
+          )}`,
+          mrkdwn_in: ['text']
+        }
       ]
     };
   }
@@ -56,46 +70,38 @@ module.exports = class InSlash {
     };
   }
 
+  playersList(players) {
+    return players.length > 0
+      ? `${players
+          .map(
+            (player, i) =>
+              `${i + 1}) ${player.name} ${
+                player.userType === 'RINGER' ? '(Ringer)' : ''
+              }\n`
+          )
+          .join('')}`
+      : 'No players yet';
+  }
+
   async addToMatch(nextMatch, player) {
     const id = nextMatch.id;
     const playerId = player.id;
-    const where = { id: id };
 
-    // If player had opted out before then also connect to players out
-    const playerWasNotPlaying = nextMatch.playersOut.some(
-      playerNotPlaying => playerNotPlaying.id === player.id
-    );
-
-    const data = playerWasNotPlaying
-      ? {
-          data: {
-            players: {
-              connect: { id: playerId }
-            },
-            playersOut: {
-              disconnect: { id: playerId }
-            }
+    const query = `mutation{
+      addToMatch( id: "${id}" playerId: "${playerId}") {
+          id
+          players {
+            id
           }
         }
-      : {
-          data: {
-            playersOut: {
-              connect: { id: playerId }
-            }
-          }
-        };
+      }`;
 
-    try {
-      const UpdateMatch = await this.db.mutation.updateMatch(
-        {
-          data,
-          where
-        },
-        '{ id time players { id name }}'
-      );
-      return UpdateMatch;
-    } catch (e) {
+    const updateMatch = await this.graphQl.request(query).catch(e => {
       throw e;
-    }
+    });
+
+    console.log('\x1b[32m', 'updatematch', updateMatch, '\x1b[0m');
+
+    return updateMatch.addToMatch;
   }
 };

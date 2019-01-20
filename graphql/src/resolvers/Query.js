@@ -1,3 +1,4 @@
+const moment = require('moment');
 const { WebClient } = require('@slack/client');
 // An access token (from your Slack app or custom integration - xoxp, xoxb, or xoxa)
 require('dotenv').config({ path: 'variables.env' });
@@ -6,9 +7,9 @@ const web = new WebClient(token);
 
 const Query = {
   players(parent, args, ctx, info) {
-    if (!ctx.request.userId) {
-      throw new Error('You must be logged in to do that!');
-    }
+    // if (!ctx.request.userId) {
+    //   throw new Error('You must be logged in to do that!');
+    // }
     return ctx.db.query.players(args, info);
   },
   matches(parent, args, ctx, info) {
@@ -28,6 +29,17 @@ const Query = {
       throw new Error('You must be logged in to do that!');
     }
     return ctx.db.query.adminOptions(args, info);
+  },
+  async futureMatches(parent, args, ctx, info) {
+    if (!ctx.request.userId) {
+      throw new Error('You must be logged in to do that!');
+    }
+    const startOfDay = moment().startOf('day');
+    const check = await ctx.db.query.matches({
+      where: { time_gt: startOfDay },
+      info
+    });
+    return check;
   },
   me(parent, args, ctx, info) {
     // check if there is a current user ID

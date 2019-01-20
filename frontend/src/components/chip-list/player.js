@@ -67,7 +67,9 @@ class Player extends Component {
               label={player.name}
               onDelete={removeFromMatch}
               avatar={avatar}
-              style={{ margin: '10px' }}
+              style={{
+                margin: '10px'
+              }}
             />
           </Fragment>
         )}

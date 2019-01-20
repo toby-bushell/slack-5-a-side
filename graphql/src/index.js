@@ -1,13 +1,25 @@
 const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
-
 require('dotenv').config({ path: 'variables.env' });
 const db = require('./db');
-
+const { decrypt } = require('./encryption');
 const createServer = require('./createServer');
 const bodyParser = require('body-parser');
 const server = createServer();
 server.express.use(cookieParser());
+
+server.express.use(bodyParser.json());
+server.express.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+
+// Handle if from slack api endpoints
+server.express.use((req, res, next) => {
+  const auth = req.headers.authorization;
+  // If auth headers sent
+  if (auth && decrypt(auth) === process.env.SLACK_TO_GRAPHQL_PASSWORD) {
+    req.userId = 'SLACK';
+  }
+  next();
+});
 
 // decode the JWT so we can get the user Id on each request
 server.express.use((req, res, next) => {
@@ -34,20 +46,14 @@ server.express.use(async (req, res, next) => {
   next();
 });
 
-server.express.use(bodyParser.json());
-server.express.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
-
 server.start(
   {
     cors: {
       credentials: true,
-      origin: process.env.FRONTEND_URL
+      origin: [process.env.FRONTEND_URL]
     }
   },
   details => {
     console.log(`server is running on port http://localhost:${details.port}`);
   }
 );
-
-// Include the rest API that is used to interact with slack
-require('./slack/index');

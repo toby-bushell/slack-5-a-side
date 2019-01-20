@@ -6,8 +6,9 @@ const web = new WebClient(token);
 const moment = require('moment');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const reminders = require('../slack/reminders');
 const getBotChannel = require('../utils/get-bot-channel');
+const axios = require('axios');
+const { encrypt } = require('../encryption');
 
 const Mutation = {
   async createPlayer(parent, args, ctx, info) {
@@ -90,8 +91,19 @@ const Mutation = {
     );
 
     // 5) Trigger reminder to start in rest api that will send to slack
-    const Reminders = new reminders();
-    Reminders.setup(match);
+    await axios
+      .post(
+        `${process.env.SLACK_API_URL}/set-reminders`,
+        { match },
+        {
+          headers: {
+            Authorization: encrypt(process.env.SLACK_TO_GRAPHQL_PASSWORD)
+          }
+        }
+      )
+      .catch(e => {
+        throw new Error(e.message);
+      });
 
     // 6) Return match
     return match;
@@ -110,16 +122,43 @@ const Mutation = {
     if (!ctx.request.userId) {
       throw new Error('You must be logged in to do that!');
     }
-
     const where = { id: args.id };
     const playerId = args.playerId;
+
+    const match = await ctx.db.query.match(
+      {
+        where: { id: args.id }
+      },
+      '{ playersOut { id } }'
+    );
+
+    // If player had opted out before then also connect to players out
+    const playerWasNotPlaying = match.playersOut.some(
+      playerNotPlaying => playerNotPlaying.id === playerId
+    );
+
+    const data = playerWasNotPlaying
+      ? {
+          data: {
+            players: {
+              connect: { id: playerId }
+            },
+            playersOut: {
+              disconnect: { id: playerId }
+            }
+          }
+        }
+      : {
+          data: {
+            playersOut: {
+              connect: { id: playerId }
+            }
+          }
+        };
+
     return ctx.db.mutation.updateMatch(
       {
-        data: {
-          players: {
-            connect: { id: playerId }
-          }
-        },
+        ...data,
         where
       },
       info
@@ -127,20 +166,51 @@ const Mutation = {
   },
 
   async removeFromMatch(parent, args, ctx, info) {
-    if (!ctx.request.userId) {
-      throw new Error('You must be logged in to do that!');
-    }
+    // if (!ctx.request.userId) {
+    //   throw new Error('You must be logged in to do that!');
+    // }
+
+    console.log('\x1b[32m', 'remove', '\x1b[0m');
 
     const where = { id: args.id };
     const playerId = args.playerId;
 
+    const match = await ctx.db.query.match(
+      {
+        where: { id: args.id }
+      },
+      '{ players { id } }'
+    );
+    console.log('\x1b[31m', 'match', match, '\x1b[0m');
+
+    // If player had opted in before then also disconnect
+    const playerWasPlaying = match.players.some(
+      playerPlaying => playerPlaying.id === playerId
+    );
+    console.log('\x1b[32m', 'player was playing', playerWasPlaying, '\x1b[0m');
+
+    const data = playerWasPlaying
+      ? {
+          data: {
+            players: {
+              disconnect: { id: playerId }
+            },
+            playersOut: {
+              connect: { id: playerId }
+            }
+          }
+        }
+      : {
+          data: {
+            playersOut: {
+              connect: { id: playerId }
+            }
+          }
+        };
+
     return ctx.db.mutation.updateMatch(
       {
-        data: {
-          players: {
-            disconnect: { id: playerId }
-          }
-        },
+        ...data,
         where
       },
       info
@@ -313,11 +383,22 @@ const Mutation = {
       const player = await ctx.db.query.player({
         where: { id: playerId }
       });
-      const { slackId } = player;
 
       // 3) Lets trigger the reminder
-      const Reminders = new reminders();
-      await Reminders.sendMessage(slackId, match);
+      await axios
+        .post(
+          `${process.env.SLACK_API_URL}/send-reminder`,
+          { player, match },
+          {
+            headers: {
+              Authorization: encrypt(process.env.SLACK_TO_GRAPHQL_PASSWORD)
+            }
+          }
+        )
+        .catch(e => {
+          throw new Error(e.message);
+        });
+
       return 'Reminder sent';
     } catch (error) {
       return error;

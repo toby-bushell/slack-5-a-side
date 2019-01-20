@@ -1,6 +1,6 @@
 module.exports = class OutSlash {
-  constructor(db, body) {
-    this.db = db;
+  constructor(graphQLClient, body) {
+    this.graphQl = graphQLClient;
     this.body = body;
   }
 
@@ -43,40 +43,31 @@ module.exports = class OutSlash {
   }
 
   async removeFromMatch(nextMatch, player) {
-    const where = { id: nextMatch.id };
+    const { id } = nextMatch;
     const playerId = player.id;
 
-    // If player had opted in before then also disconnect
-    const playerWasPlaying = nextMatch.players.some(
-      playerPlaying => playerPlaying.id === player.id
+    console.log(
+      '\x1b[32m',
+      'remove from match firing in slack',
+      id,
+      playerId,
+      '\x1b[0m'
     );
-    console.log('\x1b[32m', 'player was playing', playerWasPlaying, '\x1b[0m');
 
-    const data = playerWasPlaying
-      ? {
-          data: {
-            players: {
-              disconnect: { id: playerId }
-            },
-            playersOut: {
-              connect: { id: playerId }
-            }
+    const query = `mutation{
+      removeFromMatch( id: "${id}" playerId: "${playerId}") {
+          id
+          players {
+            id
           }
         }
-      : {
-          data: {
-            playersOut: {
-              connect: { id: playerId }
-            }
-          }
-        };
+      }`;
 
-    return this.db.mutation.updateMatch(
-      {
-        data,
-        where
-      },
-      '{ id time players { id name }}'
-    );
+    const updateMatch = await this.graphQl.request(query).catch(e => {
+      throw e;
+    });
+    console.log('\x1b[32m', 'remove updateMatch', updateMatch, '\x1b[0m');
+
+    return updateMatch.removeFromMatch;
   }
 };

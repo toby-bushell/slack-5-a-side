@@ -61,5 +61,6 @@ type Query {
     last: Int
   ): [AdminOption]!
   nextMatch: [Match]!
+  futureMatches: [Match]!
   channels: [Channel]!
 }

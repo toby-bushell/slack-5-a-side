@@ -19,6 +19,7 @@ const ChipList = ({ players, matchId }) => {
     >
       {players.length > 0 ? (
         players.map(player => {
+          console.log('player', player);
           return <Player key={player.id} player={player} matchId={matchId} />;
         })
       ) : (

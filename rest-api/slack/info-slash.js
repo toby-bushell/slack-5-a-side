@@ -1,8 +1,8 @@
 const moment = require('moment');
 
 module.exports = class InfoSlash {
-  constructor(db, body) {
-    this.db = db;
+  constructor(graphQLClient, body) {
+    this.graphQl = graphQLClient;
     this.body = body;
   }
 
@@ -10,8 +10,20 @@ module.exports = class InfoSlash {
     // Respond with time and date of next match and a list of players that are playing
 
     // 1) Get the time set in admin options
-    const adminOptionsArray = await this.db.query.adminOptions();
-    const adminOptions = adminOptionsArray[0]; // Only ever one set
+    const query = `{
+      adminOptions(first: 1) {
+        id
+        reminderTime
+        maxPlayers
+        koTime
+      }
+    }`;
+    const adminOptionsArray = await this.graphQl.request(query).catch(e => {
+      throw e;
+    });
+    console.log('\x1b[31m', 'adminOptionsArray', adminOptionsArray, '\x1b[0m');
+
+    const adminOptions = adminOptionsArray.adminOptions[0]; // Only ever one set
     const { koTime } = adminOptions;
 
     // 2) Get date from next match
