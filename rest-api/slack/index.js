@@ -2,7 +2,7 @@ const express = require('express');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
 require('dotenv').config({ path: 'variables.env' });
-const endpoint = process.env.PRISMA_URL;
+const endpoint = process.env.GRAPHQL_ENDPOINT;
 const app = express();
 const server = require('http').createServer(app);
 const InSlash = require('./in-slash');
