@@ -316,6 +316,7 @@ const Mutation = {
   },
 
   async signup(parent, args, ctx, info) {
+    throw new Error('Disabled');
     // 1) lowercase their email
     args.email = args.email.toLowerCase();
     // 2) hash their password
