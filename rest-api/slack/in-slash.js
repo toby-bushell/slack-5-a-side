@@ -21,20 +21,20 @@ module.exports = class InSlash {
       console.log('\x1b[31m', 'player count', playerCount, '\x1b[0m');
 
       if (playerCount > 10) {
-        return this.playerCouldBeIn(playerCount);
+        return this.playerCouldBeIn(playersInMatch);
       }
-      return this.playerIsIn(playerCount);
+      return this.playerIsIn(playersInMatch);
     } catch (e) {
       console.log('\x1b[31m', 'error', e, '\x1b[0m');
     }
   }
 
-  playerIsIn(playerCount) {
+  playerIsIn(players) {
     return {
       text: `:+1: Wooo you're in!`,
       attachments: [
         {
-          text: `Players so far: *${playerCount}*\n${this.playersList(
+          text: `Players so far: *${players.length}*\n${this.playersList(
             players
           )}`,
           mrkdwn_in: ['text']
@@ -59,9 +59,9 @@ module.exports = class InSlash {
     };
   }
 
-  playerCouldBeIn(playerCount) {
+  playerCouldBeIn(players) {
     return {
-      text: `You're number ${playerCount}!`,
+      text: `You're number ${players.length}!`,
       attachments: [
         {
           text: `You could be playing, as we have over 10 a humanoid will make the final decision. Priority is as follows: Missed out last week, Manifesto employee, Ringer`
