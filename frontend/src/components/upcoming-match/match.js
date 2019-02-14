@@ -25,6 +25,9 @@ const PLAYERS_NOT_IN_MATCH = gql`
       name
       slackId
       image
+      matchesOptedOut {
+        id
+      }
       matchesPlayed {
         id
       }
@@ -35,6 +38,22 @@ const PLAYERS_NOT_IN_MATCH = gql`
 class Match extends Component {
   render() {
     const { match } = this.props;
+
+    const playersNotResponded = players =>
+      players.filter(
+        player =>
+          !player.matchesOptedOut.some(
+            matchOptedOut => matchOptedOut.id === match.id
+          )
+      );
+
+    const PlayersOptedOut = players =>
+      players.filter(player =>
+        player.matchesOptedOut.some(
+          matchOptedOut => matchOptedOut.id === match.id
+        )
+      );
+
     return (
       <Fragment>
         <Card style={{ marginBottom: '30px' }}>
@@ -66,14 +85,22 @@ class Match extends Component {
             if (loading) return <p>Loading...</p>;
             if (error) return <p>Error: {error.message}</p>;
 
-            console.log('data', data, match);
             return (
               <Fragment>
                 <Typography variant="h5" gutterBottom>
                   Potential players
                 </Typography>
                 <PlayersList
-                  players={data.players}
+                  players={playersNotResponded(data.players)}
+                  matchId={match.id}
+                  notInUpcomingMatch={true}
+                  playedSort={true}
+                />
+                <Typography variant="h5" gutterBottom>
+                  Players opted out
+                </Typography>
+                <PlayersList
+                  players={PlayersOptedOut(data.players)}
                   matchId={match.id}
                   notInUpcomingMatch={true}
                   playedSort={true}

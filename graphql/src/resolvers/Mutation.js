@@ -418,6 +418,17 @@ const Mutation = {
       where: { id }
     });
     return player;
+  },
+
+  async playerPayment(parent, { playerId, amount }, ctx, info) {
+    return ctx.db.mutation.updatePlayer({
+      data: {
+        payments: {
+          create: [{ time: moment(), amountPaid: amount }]
+        }
+      },
+      where: { id: playerId }
+    });
   }
 };
 

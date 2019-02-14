@@ -22,6 +22,9 @@ const Nav = () => (
       <ListItem button component={Link} to="admin-options">
         <ListItemText>Admin</ListItemText>
       </ListItem>
+      <ListItem button component={Link} to="money">
+        <ListItemText>Money</ListItemText>
+      </ListItem>
     </List>
   </nav>
 );

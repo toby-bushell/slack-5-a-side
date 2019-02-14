@@ -95,31 +95,7 @@ class PlayersList extends Component {
               <SlackAvatar player={player} />
             </ListItemAvatar>
             <ListItemText primary={player.name} />
-            {notInUpcomingMatch && remindPossible && (
-              <Fragment>
-                {player.userType !== 'RINGER' && (
-                  <RemindPlayer playerId={player.id} matchId={matchId} />
-                )}
-              </Fragment>
-            )}
-            {notInUpcomingMatch && addPossible && (
-              <AddToMatch playerId={player.id} matchId={matchId} />
-            )}
 
-            {deletePossible && (
-              // Is therefore the player management list
-              <Fragment>
-                <ChangeUserType id={player.id} type={player.userType} />
-                <DeletePlayer id={player.id} matchId={matchId} />
-              </Fragment>
-            )}
-            {removeFromMatch && matchId && (
-              <RemoveFromMatch
-                playerId={player.id}
-                matchId={matchId}
-                singleMatch={singleMatch}
-              />
-            )}
             {playedSort && (
               <Avatar style={{ marginLeft: '20px' }}>
                 {player.matchesPlayed.length}

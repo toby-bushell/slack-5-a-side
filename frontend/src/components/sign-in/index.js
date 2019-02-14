@@ -19,12 +19,16 @@ class SignIn extends Component {
   state = {
     name: '',
     password: '',
-    email: ''
+    email: '',
+    formError: null
   };
   saveToState = e => {
     this.setState({ [e.target.name]: e.target.value });
   };
   render() {
+    const { formError } = this.state;
+    console.log('form error', formError);
+
     return (
       <Mutation
         mutation={SIGNIN_MUTATION}
@@ -42,14 +46,20 @@ class SignIn extends Component {
                 this.setState({ name: '', email: '', password: '' });
                 navigate('/');
               } catch (e) {
-                console.log('error in signup', e);
+                this.setState({ formError: e.message });
+                console.log('error in sign in', e);
               }
             }}
           >
             <Typography variant={'h4'} gutterBottom>
               Sign into your account
             </Typography>
-            {/* <Error error={error} /> */}
+            {formError && (
+              <Typography color="error" gutterBottom>
+                {formError}
+              </Typography>
+            )}
+
             <div htmlFor="email">
               <TextField
                 type="email"
@@ -60,6 +70,7 @@ class SignIn extends Component {
                 value={this.state.email}
                 onChange={this.saveToState}
                 style={{ marginBottom: '20px' }}
+                required
               />
             </div>
             <div htmlFor="password">
@@ -72,6 +83,7 @@ class SignIn extends Component {
                 label={'Password'}
                 style={{ marginBottom: '20px' }}
                 InputLabelProps={{ shrink: true }}
+                required
               />
             </div>
 

@@ -13,6 +13,7 @@ const ErrorMessages = require('./error-messages');
 const reminders = require('./reminders');
 const AuthenticateSlack = require('./authenticate');
 
+
 const { GraphQLClient } = require('graphql-request');
 const { encrypt, decrypt } = require('./encryption');
 
@@ -44,6 +45,11 @@ app.post('/send-reminder', async (req, res) => {
     throw e;
   }
   return res.json('Message sent');
+});
+
+app.get('/add-to-slack', async (req, res) => {
+  console.log('\x1b[32m', 'firing', req.query, '\x1b[0m');
+
 });
 
 app.post('/set-reminders', async (req, res) => {

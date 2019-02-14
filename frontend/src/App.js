@@ -7,6 +7,7 @@ import MatchesPage from './pages/matches';
 import Home from './pages/home';
 import SingleMatch from './pages/single-match';
 import AdminOptions from './pages/admin-options';
+import MoneyPage from './pages/money';
 import Nav from './components/nav';
 import CreateRinger from './pages/create-ringer';
 import SignIn from './components/sign-in';
@@ -35,8 +36,8 @@ class App extends Component {
         <ApolloProvider client={client}>
           <ErrorBoundary>
             <MuiThemeProvider theme={theme}>
-              <Grid container style={{ height: '100%' }}>
-                <Grid item xs={2} style={{ height: '100%' }}>
+              <Grid container>
+                <Grid item xs={2} style={{ minHeight: '100vh' }}>
                   <Nav />
                 </Grid>
                 <Grid item xs={10}>
@@ -54,6 +55,7 @@ class App extends Component {
                       <CreateRinger path="/create-ringer/" />
                       <UpdateFromSlack path="/update-from-slack" />
                       <AdminOptions path="/admin-options" />
+                      <MoneyPage path="/money" />
                     </Router>
                   </div>
                 </Grid>

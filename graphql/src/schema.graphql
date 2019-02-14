@@ -24,6 +24,7 @@ type Mutation {
   signin(email: String!, password: String!): User!
   sendReminder(playerId: ID!, matchId: ID!): String!
   updateUserType(id: ID!, type: UserType!): Player
+  playerPayment(playerId: ID!, amount: Int): Player
 }
 type Channel {
   name: String!

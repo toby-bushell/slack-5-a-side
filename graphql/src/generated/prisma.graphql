@@ -1,5 +1,5 @@
-# source: https://eu1.prisma.sh/tobybushell-3ac7e4/fiveaside/dev
-# timestamp: Fri Jan 04 2019 22:28:46 GMT+0000 (Greenwich Mean Time)
+# source: https://fiveaside-prod-a0979fe955.herokuapp.com/prod-5aside/stage-5aside
+# timestamp: Thu Feb 14 2019 22:15:44 GMT+0000 (Greenwich Mean Time)
 
 type AdminOption implements Node {
   id: ID!
@@ -297,6 +297,10 @@ type AggregateAdminOption {
 }
 
 type AggregateMatch {
+  count: Int!
+}
+
+type AggregatePayment {
   count: Int!
 }
 
@@ -736,6 +740,7 @@ type Mutation {
   createMatch(data: MatchCreateInput!): Match!
   createAdminOption(data: AdminOptionCreateInput!): AdminOption!
   createPlayer(data: PlayerCreateInput!): Player!
+  createPayment(data: PaymentCreateInput!): Payment!
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   updateMatch(data: MatchUpdateInput!, where: MatchWhereUniqueInput!): Match
   updateAdminOption(data: AdminOptionUpdateInput!, where: AdminOptionWhereUniqueInput!): AdminOption
@@ -752,10 +757,12 @@ type Mutation {
   updateManyMatches(data: MatchUpdateManyMutationInput!, where: MatchWhereInput): BatchPayload!
   updateManyAdminOptions(data: AdminOptionUpdateManyMutationInput!, where: AdminOptionWhereInput): BatchPayload!
   updateManyPlayers(data: PlayerUpdateManyMutationInput!, where: PlayerWhereInput): BatchPayload!
+  updateManyPayments(data: PaymentUpdateManyMutationInput!, where: PaymentWhereInput): BatchPayload!
   deleteManyUsers(where: UserWhereInput): BatchPayload!
   deleteManyMatches(where: MatchWhereInput): BatchPayload!
   deleteManyAdminOptions(where: AdminOptionWhereInput): BatchPayload!
   deleteManyPlayers(where: PlayerWhereInput): BatchPayload!
+  deleteManyPayments(where: PaymentWhereInput): BatchPayload!
 }
 
 enum MutationType {
@@ -785,6 +792,227 @@ type PageInfo {
   endCursor: String
 }
 
+type Payment {
+  time: DateTime
+  amountPaid: Int!
+}
+
+"""A connection to a list of items."""
+type PaymentConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [PaymentEdge]!
+  aggregate: AggregatePayment!
+}
+
+input PaymentCreateInput {
+  time: DateTime
+  amountPaid: Int!
+}
+
+input PaymentCreateManyInput {
+  create: [PaymentCreateInput!]
+}
+
+"""An edge in a connection."""
+type PaymentEdge {
+  """The item at the end of the edge."""
+  node: Payment!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+enum PaymentOrderByInput {
+  time_ASC
+  time_DESC
+  amountPaid_ASC
+  amountPaid_DESC
+  id_ASC
+  id_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type PaymentPreviousValues {
+  time: DateTime
+  amountPaid: Int!
+}
+
+input PaymentScalarWhereInput {
+  """Logical AND on all given filters."""
+  AND: [PaymentScalarWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [PaymentScalarWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [PaymentScalarWhereInput!]
+  time: DateTime
+
+  """All values that are not equal to given value."""
+  time_not: DateTime
+
+  """All values that are contained in given list."""
+  time_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  time_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  time_lt: DateTime
+
+  """All values less than or equal the given value."""
+  time_lte: DateTime
+
+  """All values greater than the given value."""
+  time_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  time_gte: DateTime
+  amountPaid: Int
+
+  """All values that are not equal to given value."""
+  amountPaid_not: Int
+
+  """All values that are contained in given list."""
+  amountPaid_in: [Int!]
+
+  """All values that are not contained in given list."""
+  amountPaid_not_in: [Int!]
+
+  """All values less than the given value."""
+  amountPaid_lt: Int
+
+  """All values less than or equal the given value."""
+  amountPaid_lte: Int
+
+  """All values greater than the given value."""
+  amountPaid_gt: Int
+
+  """All values greater than or equal the given value."""
+  amountPaid_gte: Int
+}
+
+type PaymentSubscriptionPayload {
+  mutation: MutationType!
+  node: Payment
+  updatedFields: [String!]
+  previousValues: PaymentPreviousValues
+}
+
+input PaymentSubscriptionWhereInput {
+  """Logical AND on all given filters."""
+  AND: [PaymentSubscriptionWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [PaymentSubscriptionWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [PaymentSubscriptionWhereInput!]
+
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: PaymentWhereInput
+}
+
+input PaymentUpdateManyDataInput {
+  time: DateTime
+  amountPaid: Int
+}
+
+input PaymentUpdateManyInput {
+  create: [PaymentCreateInput!]
+  updateMany: [PaymentUpdateManyWithWhereNestedInput!]
+  deleteMany: [PaymentScalarWhereInput!]
+}
+
+input PaymentUpdateManyMutationInput {
+  time: DateTime
+  amountPaid: Int
+}
+
+input PaymentUpdateManyWithWhereNestedInput {
+  where: PaymentScalarWhereInput!
+  data: PaymentUpdateManyDataInput!
+}
+
+input PaymentWhereInput {
+  """Logical AND on all given filters."""
+  AND: [PaymentWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [PaymentWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [PaymentWhereInput!]
+  time: DateTime
+
+  """All values that are not equal to given value."""
+  time_not: DateTime
+
+  """All values that are contained in given list."""
+  time_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  time_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  time_lt: DateTime
+
+  """All values less than or equal the given value."""
+  time_lte: DateTime
+
+  """All values greater than the given value."""
+  time_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  time_gte: DateTime
+  amountPaid: Int
+
+  """All values that are not equal to given value."""
+  amountPaid_not: Int
+
+  """All values that are contained in given list."""
+  amountPaid_in: [Int!]
+
+  """All values that are not contained in given list."""
+  amountPaid_not_in: [Int!]
+
+  """All values less than the given value."""
+  amountPaid_lt: Int
+
+  """All values less than or equal the given value."""
+  amountPaid_lte: Int
+
+  """All values greater than the given value."""
+  amountPaid_gt: Int
+
+  """All values greater than or equal the given value."""
+  amountPaid_gte: Int
+}
+
 enum Permission {
   ADMIN
   USER
@@ -800,6 +1028,7 @@ type Player implements Node {
   reminders: Boolean!
   matchesPlayed(where: MatchWhereInput, orderBy: MatchOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Match!]
   matchesOptedOut(where: MatchWhereInput, orderBy: MatchOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Match!]
+  payments(where: PaymentWhereInput, orderBy: PaymentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Payment!]
   slackId: ID
 }
 
@@ -823,6 +1052,7 @@ input PlayerCreateInput {
   slackId: ID
   matchesPlayed: MatchCreateManyWithoutPlayersInput
   matchesOptedOut: MatchCreateManyWithoutPlayersOutInput
+  payments: PaymentCreateManyInput
 }
 
 input PlayerCreateManyWithoutMatchesOptedOutInput {
@@ -849,6 +1079,7 @@ input PlayerCreateWithoutMatchesOptedOutInput {
   reminders: Boolean!
   slackId: ID
   matchesPlayed: MatchCreateManyWithoutPlayersInput
+  payments: PaymentCreateManyInput
 }
 
 input PlayerCreateWithoutMatchesPlayedInput {
@@ -860,6 +1091,7 @@ input PlayerCreateWithoutMatchesPlayedInput {
   reminders: Boolean!
   slackId: ID
   matchesOptedOut: MatchCreateManyWithoutPlayersOutInput
+  payments: PaymentCreateManyInput
 }
 
 """An edge in a connection."""
@@ -1219,6 +1451,7 @@ input PlayerUpdateDataInput {
   slackId: ID
   matchesPlayed: MatchUpdateManyWithoutPlayersInput
   matchesOptedOut: MatchUpdateManyWithoutPlayersOutInput
+  payments: PaymentUpdateManyInput
 }
 
 input PlayerUpdateInput {
@@ -1231,6 +1464,7 @@ input PlayerUpdateInput {
   slackId: ID
   matchesPlayed: MatchUpdateManyWithoutPlayersInput
   matchesOptedOut: MatchUpdateManyWithoutPlayersOutInput
+  payments: PaymentUpdateManyInput
 }
 
 input PlayerUpdateManyDataInput {
@@ -1298,6 +1532,7 @@ input PlayerUpdateWithoutMatchesOptedOutDataInput {
   reminders: Boolean
   slackId: ID
   matchesPlayed: MatchUpdateManyWithoutPlayersInput
+  payments: PaymentUpdateManyInput
 }
 
 input PlayerUpdateWithoutMatchesPlayedDataInput {
@@ -1309,6 +1544,7 @@ input PlayerUpdateWithoutMatchesPlayedDataInput {
   reminders: Boolean
   slackId: ID
   matchesOptedOut: MatchUpdateManyWithoutPlayersOutInput
+  payments: PaymentUpdateManyInput
 }
 
 input PlayerUpdateWithWhereUniqueWithoutMatchesOptedOutInput {
@@ -1607,6 +1843,9 @@ input PlayerWhereInput {
   matchesOptedOut_every: MatchWhereInput
   matchesOptedOut_some: MatchWhereInput
   matchesOptedOut_none: MatchWhereInput
+  payments_every: PaymentWhereInput
+  payments_some: PaymentWhereInput
+  payments_none: PaymentWhereInput
 }
 
 input PlayerWhereUniqueInput {
@@ -1618,6 +1857,7 @@ type Query {
   matches(where: MatchWhereInput, orderBy: MatchOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Match]!
   adminOptions(where: AdminOptionWhereInput, orderBy: AdminOptionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [AdminOption]!
   players(where: PlayerWhereInput, orderBy: PlayerOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Player]!
+  payments(where: PaymentWhereInput, orderBy: PaymentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Payment]!
   user(where: UserWhereUniqueInput!): User
   match(where: MatchWhereUniqueInput!): Match
   adminOption(where: AdminOptionWhereUniqueInput!): AdminOption
@@ -1626,6 +1866,7 @@ type Query {
   matchesConnection(where: MatchWhereInput, orderBy: MatchOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): MatchConnection!
   adminOptionsConnection(where: AdminOptionWhereInput, orderBy: AdminOptionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): AdminOptionConnection!
   playersConnection(where: PlayerWhereInput, orderBy: PlayerOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): PlayerConnection!
+  paymentsConnection(where: PaymentWhereInput, orderBy: PaymentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): PaymentConnection!
 
   """Fetches an object given its ID"""
   node(
@@ -1639,6 +1880,7 @@ type Subscription {
   match(where: MatchSubscriptionWhereInput): MatchSubscriptionPayload
   adminOption(where: AdminOptionSubscriptionWhereInput): AdminOptionSubscriptionPayload
   player(where: PlayerSubscriptionWhereInput): PlayerSubscriptionPayload
+  payment(where: PaymentSubscriptionWhereInput): PaymentSubscriptionPayload
 }
 
 type User implements Node {

@@ -5,6 +5,7 @@ import moment from 'moment';
 // Queries
 import { PLAYERS_NOT_IN_MATCH } from '../upcoming-match/match';
 import { NEXT_MATCHES_QUERY } from '../upcoming-match';
+import { GET_MATCH_QUERY } from '../single-match';
 // Styled
 import Button from '@material-ui/core/Button';
 
@@ -29,7 +30,8 @@ class AddToMatch extends Component {
             query: NEXT_MATCHES_QUERY,
             variables: { currentTime: moment().startOf('day') }
           },
-          { query: PLAYERS_NOT_IN_MATCH, variables: { matchId: matchId } }
+          { query: PLAYERS_NOT_IN_MATCH, variables: { matchId: matchId } },
+          { query: GET_MATCH_QUERY, variables: { id: matchId } }
         ]}
       >
         {(addToMatch, { loading, error }) => (

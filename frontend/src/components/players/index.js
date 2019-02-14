@@ -13,6 +13,14 @@ const ALL_PLAYERS_QUERY = gql`
       userType
       reminders
       image
+      payments {
+        time
+        amountPaid
+      }
+      matchesPlayed {
+        id
+        time
+      }
     }
   }
 `;
