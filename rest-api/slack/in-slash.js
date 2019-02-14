@@ -92,6 +92,7 @@ module.exports = class InSlash {
           id
           players {
             id
+            name
           }
         }
       }`;
