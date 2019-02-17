@@ -3,6 +3,7 @@ import { Query, Mutation } from 'react-apollo';
 import gql from 'graphql-tag';
 import { adopt } from 'react-adopt';
 import OptionsFrom from './options-form';
+import { theme } from '../../theme';
 // Material
 import { Grid } from '@material-ui/core';
 
@@ -47,6 +48,13 @@ const Composed = adopt({
 });
 /* eslint-enable */
 
+const styles = {
+  display: 'flex',
+  padding: `0 ${theme.toolbarPadding}`,
+  marginBottom: theme.largeSpacing,
+  flexWrap: 'wrap'
+};
+
 class AdminOptions extends Component {
   render() {
     return (
@@ -57,18 +65,7 @@ class AdminOptions extends Component {
             return <p>Error: {adminOptions.error.message}</p>;
 
           return (
-            <Grid
-              item
-              xs={12}
-              spacing={16}
-              container
-              style={{
-                display: 'flex',
-                padding: '0 14px',
-                marginBottom: '40px',
-                flexWrap: 'wrap'
-              }}
-            >
+            <Grid item xs={12} spacing={16} container style={styles}>
               <OptionsFrom
                 adminOptions={adminOptions}
                 setAdminOptions={setAdminOptions}

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Message from '../message';
+import { theme } from '../../theme';
 // Styles
 import {
   Button,
@@ -11,6 +12,16 @@ import {
   Select
 } from '@material-ui/core';
 
+const styles = {
+  input: {
+    marginBottom: theme.spacing,
+    width: '150px'
+  },
+  largeInput: {
+    marginBottom: theme.spacing,
+    width: '225px'
+  }
+};
 class OptionsForm extends Component {
   state = {
     koTime: '',
@@ -82,7 +93,7 @@ class OptionsForm extends Component {
             id="koTime"
             name="koTime"
             label="Kick off time"
-            style={{ marginBottom: '20px', width: '150px' }}
+            style={styles.input}
             required
             value={this.state.koTime}
             onChange={this.handleChange}
@@ -95,7 +106,7 @@ class OptionsForm extends Component {
             value={this.state.reminderDay}
             onChange={this.handleChange}
             inputProps={{ name: 'reminderDay', id: 'reminder-day' }}
-            style={{ marginBottom: '20px', width: '150px' }}
+            style={styles.input}
           >
             <MenuItem value={1}>Monday</MenuItem>
             <MenuItem value={2}>Tuesday</MenuItem>
@@ -112,7 +123,7 @@ class OptionsForm extends Component {
             id="reminderTime"
             name="reminderTime"
             label="Reminder Time"
-            style={{ marginBottom: '20px', width: '225px' }}
+            style={styles.largeInput}
             required
             placeholder="15:00"
             value={this.state.reminderTime}
@@ -126,7 +137,7 @@ class OptionsForm extends Component {
             id="maxPlayers"
             name="maxPlayers"
             label="Max Players"
-            style={{ marginBottom: '20px', width: '150px' }}
+            style={styles.input}
             required
             placeholder="15:00"
             value={this.state.maxPlayers}

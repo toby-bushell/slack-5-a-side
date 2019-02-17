@@ -4,6 +4,7 @@ import gql from 'graphql-tag';
 import { adopt } from 'react-adopt';
 import PlayersBalanceList from './players-balance-list';
 import { ALL_PLAYERS_QUERY } from '../players';
+import { theme } from '../../theme';
 
 // Material UI
 import {
@@ -71,7 +72,7 @@ class Players extends Component {
                 All Players
               </Typography>
               <form
-                style={{ marginBottom: '60px' }}
+                style={{ marginBottom: theme.xlSpacing }}
                 noValidate
                 onSubmit={async e => {
                   e.preventDefault();
@@ -94,7 +95,7 @@ class Players extends Component {
                   }
                 }}
               >
-                <div style={{ marginBottom: '20px' }}>
+                <div style={{ marginBottom: theme.spacing }}>
                   <FormControl>
                     <InputLabel htmlFor="age-required">Player</InputLabel>
                     <Select
@@ -119,7 +120,7 @@ class Players extends Component {
                     </Select>
                   </FormControl>
                 </div>
-                <div style={{ marginBottom: '20px' }}>
+                <div style={{ marginBottom: theme.spacing }}>
                   <TextField
                     id="standard-number"
                     label="Amount paid"

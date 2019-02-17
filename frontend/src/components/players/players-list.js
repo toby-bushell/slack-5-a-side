@@ -5,6 +5,7 @@ import AddToMatch from './add-to-match';
 import RemindPlayer from './remind-player';
 import RemoveFromMatch from '../players/remove-from-match';
 import SlackAvatar from '../slack-avatar';
+import { theme } from '../../theme';
 
 // Material
 import {
@@ -23,6 +24,12 @@ import {
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
 import ArrowUpward from '@material-ui/icons/ArrowUpward';
 
+const styles = {
+  icon: {
+    fontSize: '1em',
+    marginLeft: '5px'
+  }
+};
 class PlayersList extends Component {
   state = {
     value: 0,
@@ -121,7 +128,7 @@ class PlayersList extends Component {
               />
             )}
             {playedSort && (
-              <Avatar style={{ marginLeft: '20px' }}>
+              <Avatar style={{ marginLeft: theme.spacing }}>
                 {player.matchesPlayed.length}
               </Avatar>
             )}
@@ -153,13 +160,9 @@ class PlayersList extends Component {
                   label="Played"
                   icon={
                     playedOrder === 'DESC' ? (
-                      <ArrowDownward
-                        style={{ fontSize: '1em', marginLeft: '5px' }}
-                      />
+                      <ArrowDownward style={styles.icon} />
                     ) : (
-                      <ArrowUpward
-                        style={{ fontSize: '1em', marginLeft: '5px' }}
-                      />
+                      <ArrowUpward style={styles.icon} />
                     )
                   }
                 />

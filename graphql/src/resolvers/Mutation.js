@@ -122,6 +122,7 @@ const Mutation = {
     if (!ctx.request.userId) {
       throw new Error('You must be logged in to do that!');
     }
+
     const where = { id: args.id };
     const playerId = args.playerId;
 
@@ -132,9 +133,18 @@ const Mutation = {
       '{ playersOut { id } }'
     );
 
-    // If player had opted out before then also connect to players out
+    // If player had opted out before then also disconnect to players out
     const playerWasNotPlaying = match.playersOut.some(
       playerNotPlaying => playerNotPlaying.id === playerId
+    );
+
+    console.log('\x1b[32m', 'firing add to match', playerId, '\x1b[0m');
+
+    console.log(
+      '\x1b[32m',
+      'playerWasNotPlaying',
+      playerWasNotPlaying,
+      '\x1b[0m'
     );
 
     const data = playerWasNotPlaying
@@ -150,7 +160,7 @@ const Mutation = {
         }
       : {
           data: {
-            playersOut: {
+            players: {
               connect: { id: playerId }
             }
           }
@@ -411,24 +421,46 @@ const Mutation = {
       throw new Error('You must be logged in to do that!');
     }
 
-    const player = await ctx.db.mutation.updatePlayer({
-      data: {
-        userType: type
+    const player = await ctx.db.mutation.updatePlayer(
+      {
+        data: {
+          userType: type
+        },
+        where: { id }
       },
-      where: { id }
-    });
+      info
+    );
     return player;
   },
 
   async playerPayment(parent, { playerId, amount }, ctx, info) {
-    return ctx.db.mutation.updatePlayer({
-      data: {
-        payments: {
-          create: [{ time: moment(), amountPaid: amount }]
-        }
+    return ctx.db.mutation.updatePlayer(
+      {
+        data: {
+          payments: {
+            create: [{ time: moment(), amountPaid: amount }]
+          }
+        },
+        where: { id: playerId }
       },
-      where: { id: playerId }
-    });
+      info
+    );
+  },
+
+  async deletePayment(parent, { playerId, transactionTime }, ctx, info) {
+    return ctx.db.mutation.updatePlayer(
+      {
+        data: {
+          payments: {
+            deleteMany: {
+              time: transactionTime
+            }
+          }
+        },
+        where: { id: playerId }
+      },
+      info
+    );
   }
 };
 

@@ -1,6 +1,6 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import SlackAvatar from '../slack-avatar';
-
+import { getPlayerBalance, amountColours } from './utils';
 // Material
 import {
   List,
@@ -10,18 +10,21 @@ import {
   AppBar,
   Tabs,
   Tab,
-  Avatar,
   Typography,
   Toolbar
 } from '@material-ui/core';
 
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
 import ArrowUpward from '@material-ui/icons/ArrowUpward';
+import PlayerBalanceSummary from './player-balance-summary';
+import { theme } from '../../theme';
 
 class PlayersList extends Component {
   state = {
     value: 0,
-    sortOrder: 'DESC'
+    sortOrder: 'DESC',
+    activePlayerId: null,
+    modalOpen: false
   };
 
   handleChange = async (event, value) => {
@@ -34,14 +37,6 @@ class PlayersList extends Component {
     }
   };
 
-  playerBalance = player => {
-    console.log('player balance', player.matchesPlayed.length * 5);
-    console.log('player balance', player.amountPaid);
-
-    const amountOwed = player.matchesPlayed.length * 5;
-    const balance = player.amountPaid - amountOwed;
-    return balance;
-  };
   updateSortOrder = async () => {
     const { sortOrder } = this.state;
 
@@ -52,8 +47,8 @@ class PlayersList extends Component {
     }
   };
   comparePlayers = (a, b) => {
-    if (this.playerBalance(a) < this.playerBalance(b)) return -1;
-    if (this.playerBalance(a) > this.playerBalance(b)) return 1;
+    if (getPlayerBalance(a) < getPlayerBalance(b)) return -1;
+    if (getPlayerBalance(a) > getPlayerBalance(b)) return 1;
     return 0;
   };
 
@@ -66,49 +61,65 @@ class PlayersList extends Component {
 
     if (sortOrder === 'DESC') {
       sortedPlayers = [...players].sort((a, b) => {
-        if (this.playerBalance(a) < this.playerBalance(b)) return -1;
-        if (this.playerBalance(a) > this.playerBalance(b)) return 1;
+        if (getPlayerBalance(a) < getPlayerBalance(b)) return -1;
+        if (getPlayerBalance(a) > getPlayerBalance(b)) return 1;
         return 0;
       });
     } else {
       sortedPlayers = [...players].sort((a, b) => {
-        if (this.playerBalance(a) > this.playerBalance(b)) return -1;
-        if (this.playerBalance(a) < this.playerBalance(b)) return 1;
+        if (getPlayerBalance(a) > getPlayerBalance(b)) return -1;
+        if (getPlayerBalance(a) < getPlayerBalance(b)) return 1;
         return 0;
       });
     }
     return sortedPlayers;
   };
 
+  handlePlayerClick = player => {
+    if (this.state.activePlayer && player.id === this.state.activePlayer.id) {
+      this.setState({
+        activePlayerId: null,
+        modalOpen: false
+      });
+    } else {
+      this.setState({
+        activePlayerId: player.id,
+        modalOpen: true
+      });
+    }
+  };
+
   render() {
     const { value, sortOrder } = this.state;
     let { players } = this.props;
-    console.log('players', this.state);
 
     players = this.sortByBalance();
 
     const playerList = items =>
       items.length > 0 ? (
         items.map(player => {
-          const isInRed = this.playerBalance(player) < 0;
+          const isInRed = getPlayerBalance(player) < 0;
 
           return (
-            <ListItem key={player.id}>
+            <ListItem
+              key={player.id}
+              onClick={() => this.handlePlayerClick(player)}
+            >
               <ListItemAvatar>
                 <SlackAvatar player={player} />
               </ListItemAvatar>
               <ListItemText primary={player.name} />
 
               <Typography
-                color={isInRed ? 'error' : 'primary'}
                 style={{
-                  marginLeft: '20px',
+                  marginLeft: theme.spacing,
                   textAlign: 'center',
                   minWidth: '50px',
-                  fontWeight: isInRed && 'bold'
+                  fontWeight: isInRed && 'bold',
+                  color: amountColours(getPlayerBalance(player))
                 }}
               >
-                £{this.playerBalance(player)}
+                £{getPlayerBalance(player)}
               </Typography>
             </ListItem>
           );
@@ -137,11 +148,9 @@ class PlayersList extends Component {
               label="Balance"
               icon={
                 sortOrder === 'DESC' ? (
-                  <ArrowDownward
-                    style={{ fontSize: '1em', marginLeft: '5px' }}
-                  />
+                  <ArrowDownward style={{ fontSize: '1', marginLeft: '5px' }} />
                 ) : (
-                  <ArrowUpward style={{ fontSize: '1em', marginLeft: '5px' }} />
+                  <ArrowUpward style={{ fontSize: '1', marginLeft: '5px' }} />
                 )
               }
             />
@@ -150,6 +159,12 @@ class PlayersList extends Component {
         {value === 0 && <List>{playerList(manifesto)}</List>}
         {value === 1 && <List>{playerList(contractors)}</List>}
         {value === 2 && <List>{playerList(ringers)}</List>}
+        <PlayerBalanceSummary
+          open={this.state.modalOpen}
+          activePlayerId={this.state.activePlayerId}
+          players={this.props.players}
+          onClose={player => this.handlePlayerClick(player)}
+        />
       </div>
     );
   }

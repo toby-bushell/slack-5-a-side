@@ -9,10 +9,10 @@ const InSlash = require('./in-slash');
 const HelpSlash = require('./help-slash');
 const InfoSlash = require('./info-slash');
 const OutSlash = require('./out-slash');
+const BalanceSlash = require('./balance-slash');
 const ErrorMessages = require('./error-messages');
 const reminders = require('./reminders');
 const AuthenticateSlack = require('./authenticate');
-
 
 const { GraphQLClient } = require('graphql-request');
 const { encrypt, decrypt } = require('./encryption');
@@ -49,7 +49,6 @@ app.post('/send-reminder', async (req, res) => {
 
 app.get('/add-to-slack', async (req, res) => {
   console.log('\x1b[32m', 'firing', req.query, '\x1b[0m');
-
 });
 
 app.post('/set-reminders', async (req, res) => {
@@ -86,6 +85,13 @@ app.post('/slash', async (req, res) => {
       id
       name
       slackId
+      payments {
+        time
+        amountPaid
+      }
+      matchesPlayed {
+        time
+      }
     }
   }`;
 
@@ -138,6 +144,12 @@ app.post('/slash', async (req, res) => {
     case 'out':
       const outSlash = new OutSlash(graphQLClient);
       messageToRespond = await outSlash.response(nextMatch, player);
+      break;
+    case 'balance':
+      const balanceSlash = new BalanceSlash(graphQLClient);
+      messageToRespond = await balanceSlash.response(player);
+      console.log('messageToRespond', messageToRespond);
+
       break;
     case 'help':
       messageToRespond = await helpSlash.response();

@@ -25,6 +25,7 @@ type Mutation {
   sendReminder(playerId: ID!, matchId: ID!): String!
   updateUserType(id: ID!, type: UserType!): Player
   playerPayment(playerId: ID!, amount: Int): Player
+  deletePayment(playerId: ID!, transactionTime: DateTime): Player
 }
 type Channel {
   name: String!

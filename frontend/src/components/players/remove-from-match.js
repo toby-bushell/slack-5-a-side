@@ -68,7 +68,7 @@ class RemoveFromMatch extends Component {
     }
   };
   render() {
-    const { matchId, playerId, updateCache = true } = this.props;
+    const { matchId, playerId } = this.props;
     return (
       <Mutation
         mutation={REMOVE_PLAYER_FROM_MATCH}
