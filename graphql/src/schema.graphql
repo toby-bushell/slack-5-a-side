@@ -7,7 +7,7 @@ type Mutation {
     username: String!
     image: String
   ): Player
-  createRinger(name: String!, email: String!): Player
+  createRinger(name: String!): Player
   deletePlayer(id: ID!): Player
   createMatch(time: DateTime): Match
   deleteMatch(id: ID!): Match

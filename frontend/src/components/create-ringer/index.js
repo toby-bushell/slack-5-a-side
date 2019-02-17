@@ -8,8 +8,8 @@ import { ALL_PLAYERS_QUERY } from '../players';
 import { Button, TextField, Typography, Grid } from '@material-ui/core';
 
 const CREATE_RINGER_MUTATION = gql`
-  mutation CREATE_RINGER_MUTATION($name: String!, $email: String!) {
-    createRinger(name: $name, email: $email) {
+  mutation CREATE_RINGER_MUTATION($name: String!) {
+    createRinger(name: $name) {
       id
     }
   }
@@ -18,7 +18,6 @@ const CREATE_RINGER_MUTATION = gql`
 class CreateRinger extends Component {
   state = {
     name: '',
-    email: '',
     message: '',
     error: false
   };
@@ -91,19 +90,7 @@ class CreateRinger extends Component {
                   InputLabelProps={{ shrink: true }}
                 />
               </div>
-              <div>
-                <TextField
-                  type="text"
-                  label="email"
-                  id="email"
-                  name="email"
-                  margin={'normal'}
-                  required
-                  value={this.state.email}
-                  onChange={this.handleChange}
-                  InputLabelProps={{ shrink: true }}
-                />
-              </div>
+
               <div>
                 <TextField
                   disabled
