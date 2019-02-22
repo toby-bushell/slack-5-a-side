@@ -1,18 +1,20 @@
-const express = require('express');
+import { Request, Response } from 'express';
+require('dotenv').config({ path: 'variables.env' });
+
+import express = require('express');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
-require('dotenv').config({ path: 'variables.env' });
 const endpoint = process.env.GRAPHQL_ENDPOINT;
 const app = express();
 const server = require('http').createServer(app);
-const InSlash = require('./in-slash');
-const HelpSlash = require('./help-slash');
-const InfoSlash = require('./info-slash');
-const OutSlash = require('./out-slash');
-const BalanceSlash = require('./balance-slash');
-const ErrorMessages = require('./error-messages');
-const reminders = require('./reminders');
-const AuthenticateSlack = require('./authenticate');
+import { InSlash } from './in-slash';
+import { HelpSlash } from './help-slash';
+import { InfoSlash } from './info-slash';
+import { OutSlash } from './out-slash';
+import { BalanceSlash } from './balance-slash';
+import { ErrorMessages } from './error-messages';
+import { Reminders } from './reminders';
+import AuthenticateSlack from './authenticate';
 
 const { GraphQLClient } = require('graphql-request');
 const { encrypt, decrypt } = require('./encryption');
@@ -27,9 +29,9 @@ app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false })); // support encoded bodies
 
-app.post('/send-reminder', async (req, res) => {
+app.post('/send-reminder', async (req: Request, res: Response) => {
   const auth = req.headers.authorization;
-
+  
   // If auth headers sent
   if (!auth || decrypt(auth) !== process.env.SLACK_TO_GRAPHQL_PASSWORD) {
     return res.json('Not authenticated');
@@ -38,42 +40,38 @@ app.post('/send-reminder', async (req, res) => {
   if (!player || !match)
     return res.json('need to provide a player and a match');
 
-  const Reminders = new reminders(graphQLClient);
+  const reminders = new Reminders(graphQLClient);
   try {
-    Reminders.sendMessage(player.slackId, match);
+    reminders.sendMessage(player.slackId, match);
   } catch (e) {
     throw e;
   }
   return res.json('Message sent');
 });
 
-app.get('/add-to-slack', async (req, res) => {
-  console.log('\x1b[32m', 'firing', req.query, '\x1b[0m');
-});
+// app.post('/set-reminders', async (req, res) => {
+//   // If auth headers sent
+//   if (!auth || decrypt(auth) !== process.env.SLACK_TO_GRAPHQL_SECRET) {
+//     return res.json('Not authenticated');
+//   }
+//   const { matchId } = req.body;
+//   if (!matchId) return res.json('need a matchId');
 
-app.post('/set-reminders', async (req, res) => {
-  // If auth headers sent
-  if (!auth || decrypt(auth) !== process.env.SLACK_TO_GRAPHQL_SECRET) {
-    return res.json('Not authenticated');
-  }
-  const { matchId } = req.body;
-  if (!matchId) return res.json('need a matchId');
-
-  const Reminders = new reminders(graphQLClient);
-  try {
-    Reminders.setup(match);
-  } catch (e) {
-    throw e;
-  }
-  return res.json('Reminder set up');
-});
+//   const Reminders = new reminders(graphQLClient);
+//   try {
+//     Reminders.setup(match);
+//   } catch (e) {
+//     throw e;
+//   }
+//   return res.json('Reminder set up');
+// });
 
 app.use(AuthenticateSlack);
 
 /**
  * Handle slash commands
  */
-app.post('/slash', async (req, res) => {
+app.post('/slash', async (req: Request, res: Response) => {
   const { body } = req;
   const { text } = body;
 
@@ -97,7 +95,7 @@ app.post('/slash', async (req, res) => {
 
   const playerResponse = await graphQLClient
     .request(playersQuery)
-    .catch(e => res.json(e.message));
+    .catch((e: Error) => res.json(e.message));
 
   console.log('\x1b[32m', 'playerResponse', playerResponse, '\x1b[0m');
   const player = playerResponse.players[0];
@@ -124,7 +122,7 @@ app.post('/slash', async (req, res) => {
   }`;
   const nextMatchResponse = await graphQLClient
     .request(matchesQuery)
-    .catch(e => res.json(e.message));
+    .catch((e: Error) => res.json(e.message));
   const nextMatch = nextMatchResponse.nextMatch[0];
   // If no match return
   if (!nextMatch) return res.json(ErrorMessages.noMatchSet);
@@ -181,7 +179,7 @@ app.post('/slash', async (req, res) => {
 /**
  * Receives button message response from slack
  */
-app.post('/interactive', async (req, res) => {
+app.post('/interactive', async (req: Request, res: Response) => {
   console.log('\x1b[31m', 'interactive firing at least', '\x1b[0m');
 
   // 1) Grab the action values
@@ -210,7 +208,7 @@ app.post('/interactive', async (req, res) => {
   }`;
   const nextMatchResponse = await graphQLClient
     .request(matchesQuery)
-    .catch(e => res.json(e.message));
+    .catch((e: Error) => res.json(e.message));
 
   console.log('\x1b[32m', 'nextMatchResponse', nextMatchResponse, '\x1b[0m');
 
@@ -228,7 +226,7 @@ app.post('/interactive', async (req, res) => {
   }`;
   const playersQueryResponse = await graphQLClient
     .request(playersQuery)
-    .catch(e => res.json(e.message));
+    .catch((e: Error) => res.json(e.message));
   const player = playersQueryResponse.players[0];
 
   let messageToRespond;
@@ -251,6 +249,6 @@ const port = process.env.PORT || 3002;
 
 server.listen(port, async () => {
   console.log(`Find the server at: http://localhost:${port}/`); // eslint-disable-line no-console
-  const Reminders = new reminders(graphQLClient);
-  Reminders.setAllReminders();
+  const reminders = new Reminders(graphQLClient);
+  reminders.setAllReminders();
 });
