@@ -88,6 +88,7 @@ var Reminders = /** @class */ (function () {
                     case 0:
                         if (!match)
                             throw 'No match id';
+                        console.log('sending reminder');
                         return [4 /*yield*/, this.getPlayersToSend(match.players || [], match.playersOut || [])];
                     case 1:
                         playersToSend = _a.sent();
