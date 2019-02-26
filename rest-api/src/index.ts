@@ -31,7 +31,7 @@ app.use(bodyParser.urlencoded({ extended: false })); // support encoded bodies
 
 app.post('/send-reminder', async (req: Request, res: Response) => {
   const auth = req.headers.authorization;
-  
+
   // If auth headers sent
   if (!auth || decrypt(auth) !== process.env.SLACK_TO_GRAPHQL_PASSWORD) {
     return res.json('Not authenticated');

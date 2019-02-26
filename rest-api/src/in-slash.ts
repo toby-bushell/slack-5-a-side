@@ -1,7 +1,7 @@
 import { Match, Player } from './types';
 
 export class InSlash {
-  constructor() {}
+  constructor(private graphQLClient: any) {}
 
   async response(nextMatch: Match, player: Player) {
     console.log('\x1b[34m', 'firing', '\x1b[0m');
@@ -96,9 +96,11 @@ export class InSlash {
         }
       }`;
 
-    const updateMatch = await this.graphQl.request(query).catch((e: Error) => {
-      throw e;
-    });
+    const updateMatch = await this.graphQLClient
+      .request(query)
+      .catch((e: Error) => {
+        throw e;
+      });
 
     console.log('\x1b[32m', 'updatematch', updateMatch, '\x1b[0m');
 

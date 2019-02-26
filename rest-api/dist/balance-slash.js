@@ -37,7 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var BalanceSlash = /** @class */ (function () {
     function BalanceSlash(graphQLClient) {
-        this.graphQl = graphQLClient;
+        this.graphQLClient = graphQLClient;
     }
     BalanceSlash.prototype.response = function (player) {
         return __awaiter(this, void 0, void 0, function () {

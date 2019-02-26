@@ -37,7 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var InSlash = /** @class */ (function () {
     function InSlash(graphQLClient) {
-        this.graphQl = graphQLClient;
+        this.graphQLClient = graphQLClient;
     }
     InSlash.prototype.response = function (nextMatch, player) {
         return __awaiter(this, void 0, void 0, function () {
@@ -122,7 +122,9 @@ var InSlash = /** @class */ (function () {
                         id = nextMatch.id;
                         playerId = player.id;
                         query = "mutation{\n      addToMatch( id: \"" + id + "\" playerId: \"" + playerId + "\") {\n          id\n          players {\n            id\n            name\n          }\n        }\n      }";
-                        return [4 /*yield*/, this.graphQl.request(query).catch(function (e) {
+                        return [4 /*yield*/, this.graphQLClient
+                                .request(query)
+                                .catch(function (e) {
                                 throw e;
                             })];
                     case 1:
