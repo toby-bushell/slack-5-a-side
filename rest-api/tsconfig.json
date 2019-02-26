@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "lib": ["es2015", "dom"],
+    "lib": ["es2015", "dom", "esnext.asynciterable"],
     "allowJs": true, // <-- option to allow js files as input in the ts compiler
     "outDir": "./dist/",
     "sourceMap": true,

@@ -1,5 +1,7 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 // https://github.com/rommelsantor/Timeout/blob/master/src/timeout.js
-var Timeout = (function () {
+exports.Timeout = (function () {
     var keyId = {};
     var metadata = {};
     var clear = function (key, erase) {
@@ -93,5 +95,4 @@ var Timeout = (function () {
         set: set
     };
 })();
-module.exports = Timeout;
 //# sourceMappingURL=timeout.js.map

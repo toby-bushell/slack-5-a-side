@@ -1,4 +1,4 @@
-const moment = require('moment');
+import * as moment from 'moment';
 import { Match, AdminOptions } from './types';
 
 export class InfoSlash {

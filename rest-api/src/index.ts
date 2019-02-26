@@ -1,4 +1,12 @@
 import { Request, Response } from 'express';
+import AuthenticateSlack from './authenticate';
+import { BalanceSlash } from './balance-slash';
+import { ErrorMessages } from './error-messages';
+import { HelpSlash } from './help-slash';
+import { InSlash } from './in-slash';
+import { InfoSlash } from './info-slash';
+import { OutSlash } from './out-slash';
+import { Reminders } from './reminders';
 require('dotenv').config({ path: 'variables.env' });
 
 import express = require('express');
@@ -7,14 +15,6 @@ const bodyParser = require('body-parser');
 const endpoint = process.env.GRAPHQL_ENDPOINT;
 const app = express();
 const server = require('http').createServer(app);
-import { InSlash } from './in-slash';
-import { HelpSlash } from './help-slash';
-import { InfoSlash } from './info-slash';
-import { OutSlash } from './out-slash';
-import { BalanceSlash } from './balance-slash';
-import { ErrorMessages } from './error-messages';
-import { Reminders } from './reminders';
-import AuthenticateSlack from './authenticate';
 
 const { GraphQLClient } = require('graphql-request');
 const { encrypt, decrypt } = require('./encryption');

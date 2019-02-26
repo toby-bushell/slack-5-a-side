@@ -1,12 +1,12 @@
 require('dotenv').config({ path: 'variables.env' });
-const { WebClient } = require('@slack/client');
+import { WebClient } from '@slack/client';
 const token = process.env.SLACK_TOKEN;
 const web = new WebClient(token);
 
 const getBotChannel = async () => {
   // 1) First get all slack channels
   try {
-    const channelsInfo = await web.conversations.list();
+    const channelsInfo: any = await web.conversations.list(); // https://github.com/slackapi/node-slack-sdk/issues/581
     console.log('\x1b[32m', 'channelsInfo', channelsInfo, '\x1b[0m');
 
     // 2) Lets get the chanel that the bot is added to

@@ -1,6 +1,6 @@
 const qs = require('qs');
-const crypto = require('crypto');
-import { Request, Response, NextFunction } from 'express';
+import * as crypto from 'crypto';
+import { NextFunction, Request, Response } from 'express';
 
 export default function(req: Request, res: Response, next: NextFunction) {
   const timestamp = (req.headers[

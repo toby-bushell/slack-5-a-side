@@ -1,5 +1,5 @@
 require('dotenv').config({ path: 'variables.env' });
-const crypto = require('crypto');
+import * as crypto from 'crypto';
 const algorithm = 'aes-256-ctr';
 const password = process.env.SLACK_TO_GRAPHQL_SECRET;
 

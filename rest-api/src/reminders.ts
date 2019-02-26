@@ -1,10 +1,10 @@
+import * as moment from 'moment';
 import { Match, Player } from './types';
+import { Timeout } from './utils/timeout';
 const { WebClient } = require('@slack/client');
-const moment = require('moment');
 require('dotenv').config({ path: 'variables.env' });
 const token = process.env.SLACK_TOKEN;
 const web = new WebClient(token);
-const Timeout = require('../utils/timeout.js');
 
 export class Reminders {
   constructor(private graphQLClient: any) {}

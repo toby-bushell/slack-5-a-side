@@ -1,5 +1,5 @@
 // https://github.com/rommelsantor/Timeout/blob/master/src/timeout.js
-const Timeout = (() => {
+export const Timeout = (() => {
   const keyId = {};
   const metadata = {};
 
@@ -110,5 +110,3 @@ const Timeout = (() => {
     set
   };
 })();
-
-module.exports = Timeout;

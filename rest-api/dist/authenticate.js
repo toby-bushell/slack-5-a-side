@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var qs = require('qs');
-var crypto = require('crypto');
+var crypto = require("crypto");
 function default_1(req, res, next) {
     var timestamp = req.headers['x-slack-request-timestamp'];
     var slackSig = req.headers['x-slack-signature'];

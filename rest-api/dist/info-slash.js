@@ -35,7 +35,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var moment = require('moment');
+var moment = require("moment");
 var InfoSlash = /** @class */ (function () {
     function InfoSlash(graphQLClient) {
         this.graphQLClient = graphQLClient;

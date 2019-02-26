@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -34,10 +35,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 var _this = this;
+Object.defineProperty(exports, "__esModule", { value: true });
 require('dotenv').config({ path: 'variables.env' });
-var WebClient = require('@slack/client').WebClient;
+var client_1 = require("@slack/client");
 var token = process.env.SLACK_TOKEN;
-var web = new WebClient(token);
+var web = new client_1.WebClient(token);
 var getBotChannel = function () { return __awaiter(_this, void 0, void 0, function () {
     var channelsInfo, channel, error_1;
     return __generator(this, function (_a) {

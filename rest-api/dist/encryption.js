@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require('dotenv').config({ path: 'variables.env' });
-var crypto = require('crypto');
+var crypto = require("crypto");
 var algorithm = 'aes-256-ctr';
 var password = process.env.SLACK_TO_GRAPHQL_SECRET;
 exports.encrypt = function (text) {

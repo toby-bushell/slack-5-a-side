@@ -35,12 +35,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var moment = require("moment");
+var timeout_1 = require("./utils/timeout");
 var WebClient = require('@slack/client').WebClient;
-var moment = require('moment');
 require('dotenv').config({ path: 'variables.env' });
 var token = process.env.SLACK_TOKEN;
 var web = new WebClient(token);
-var Timeout = require('../utils/timeout.js');
 var Reminders = /** @class */ (function () {
     function Reminders(graphQLClient) {
         this.graphQLClient = graphQLClient;
@@ -63,7 +63,7 @@ var Reminders = /** @class */ (function () {
                         if (timer < 0)
                             return [2 /*return*/];
                         quickTimer = 2000;
-                        return [4 /*yield*/, Timeout.set(id, function () { return _this.sendReminder(match); }, timer)];
+                        return [4 /*yield*/, timeout_1.Timeout.set(id, function () { return _this.sendReminder(match); }, timer)];
                     case 2:
                         _a.sent();
                         // 3) Just return
