@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "lib": ["es2015", "dom"],
+    "allowJs": true, // <-- option to allow js files as input in the ts compiler
     "outDir": "./dist/",
     "sourceMap": true,
     "noImplicitAny": true,
