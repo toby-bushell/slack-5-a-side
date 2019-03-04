@@ -12,11 +12,12 @@ export const encrypt = (text: string) => {
   return crypted;
 };
 export const decrypt = (text: string) => {
-  console.log('\x1b[32m', 'decrypting', '\x1b[0m');
+  console.log('\x1b[32m', 'decrypting', text, password, '\x1b[0m');
 
   var decipher = crypto.createDecipher(algorithm, password);
   var dec = decipher.update(text, 'hex', 'utf8');
   dec += decipher.final('utf8');
+  console.log('\x1b[32m', 'dec', dec, '\x1b[0m');
   return dec;
 };
 

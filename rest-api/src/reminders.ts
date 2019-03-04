@@ -5,25 +5,34 @@ const { WebClient } = require('@slack/client');
 require('dotenv').config({ path: 'variables.env' });
 const token = process.env.SLACK_TOKEN;
 const web = new WebClient(token);
+const schedule = require('node-schedule');
 
 export class Reminders {
   constructor(private graphQLClient: any) {}
 
   async setup(match: Match) {
     if (!match) throw 'no match set';
-    console.log('\x1b[32m', 'setup match', match, '\x1b[0m');
 
     const { reminderTime, id } = match;
 
     // 1) work out timeout in seconds
     const timer = await this.getSecondsTillReminder(reminderTime);
-    console.log('\x1b[31m', 'timer', timer, reminderTime, '\x1b[0m');
 
-    if (timer < 0) return;
+    if (moment(reminderTime).diff(moment()) < 0) return;
 
     // 2) create and set timeout with the matchId as the key
     const quickTimer = 2000;
-    await Timeout.set(id, () => this.sendReminder(match), timer);
+    // await Timeout.set(id, () => this.sendReminder(match), timer);
+    var j = schedule.scheduleJob(
+      reminderTime,
+      function() {
+        console.log('scheduleJob');
+
+        this.sendReminder(match);
+      }.bind(this)
+    );
+
+    // console.log('timeout has b  een set for', timer);
 
     // 3) Just return
     return true;

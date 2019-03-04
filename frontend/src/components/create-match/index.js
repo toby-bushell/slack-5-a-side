@@ -24,6 +24,7 @@ const CREATE_MATCH_MUTATION = gql`
         id
         name
       }
+      reminderTime
       playersOut {
         id
         name

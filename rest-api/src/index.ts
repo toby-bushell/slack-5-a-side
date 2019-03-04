@@ -49,22 +49,26 @@ app.post('/send-reminder', async (req: Request, res: Response) => {
   return res.json('Message sent');
 });
 
-// app.post('/set-reminders', async (req, res) => {
-//   // If auth headers sent
-//   if (!auth || decrypt(auth) !== process.env.SLACK_TO_GRAPHQL_SECRET) {
-//     return res.json('Not authenticated');
-//   }
-//   const { matchId } = req.body;
-//   if (!matchId) return res.json('need a matchId');
+app.post('/set-reminders', async (req: Request, res: Response) => {
+  const auth = req.headers.authorization;
+  // If auth headers sent
+  if (!auth || decrypt(auth) !== process.env.SLACK_TO_GRAPHQL_PASSWORD) {
+    return res.json('Not authenticated');
+  }
 
-//   const Reminders = new reminders(graphQLClient);
-//   try {
-//     Reminders.setup(match);
-//   } catch (e) {
-//     throw e;
-//   }
-//   return res.json('Reminder set up');
-// });
+  const { match } = req.body;
+
+  if (!match || !match.id) return res.json('need a matchId');
+
+  const reminders = new Reminders(graphQLClient);
+
+  try {
+    reminders.setup(match);
+  } catch (e) {
+    throw e;
+  }
+  return res.json('Reminder set up');
+});
 
 app.use(AuthenticateSlack);
 
